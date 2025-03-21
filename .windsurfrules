@@ -1,0 +1,50 @@
+# General Code Style & Formatting
+
+- Use English for all code, comments and documentation.
+- Always declare the type of each variable and function parameters.
+- Avoid using any.
+- Create necessary types and interfaces.
+
+# Naming Conventions
+
+- Use camelCase for variables, functions, and methods.
+- Use kebab-case for file and directory names.
+- Use UPPERCASE for environment variables.
+- Avoid magic numbers and define constants.
+
+# Functions & Logic
+
+- Keep functions short and single-purpose (<20 lines).
+- Avoid deeply nested blocks by:
+  - Using early returns.
+  - Extracting logic into utility functions.
+  - Use higher-order functions (map, filter, reduce) to simplify logic.
+  - Use arrow functions.
+
+# Data Handling
+
+- Avoid excessive use of primitive types; encapsulate data in composite types.
+- Avoid placing validation inside functions—use classes with internal validation instead.
+- Prefer immutability for data:
+- Use readonly for immutable properties.
+- Use as const for literals that never change.
+
+# VUE and NUXT specific
+
+- Use <script lang="ts" setup> style for components.
+- Use <style lang="scss"> for styles.
+- The order in .vue files should be:
+  - <script lang="ts" setup>
+  - <template>
+  - <style lang="scss">
+- Do not import ref, watch, compoted or any other vue/nuxt specific functions. It's already auto imported.
+- Use `defineProps` for component props with IProps interface.
+- Use `defineEmits` for component events with IEvents interface..
+
+# LIBS
+
+- Use tailwindcss for styling.
+- Use shadcn-nuxt for components.
+- Use @nuxtjs/supabase for database operations.
+- Use @vueuse/core for utilities when possible.
+
