@@ -32,9 +32,21 @@ const selectedYear = ref(new Date().getFullYear())
 const budgets = ref<Budget[]>([])
 const isLoading = ref(false)
 const error = ref('')
+const editingItemId = ref<string | null>(null)
 
 // New budget form
 const newItem = reactive({
+  name: '',
+  amount: 0,
+  currency_code: 'USD',
+  tags: [] as Tag[],
+  period: 'monthly',
+  is_one_time_purchase: false,
+})
+
+// Edit item form
+const editItem = reactive({
+  id: '',
   name: '',
   amount: 0,
   currency_code: 'USD',
@@ -235,39 +247,137 @@ async function saveBudget() {
   }
 }
 
-function handleTagSelect(value: any) {
+function handleTagSelect(value: any, isEditMode = false) {
   if (typeof value === 'string' && value.trim()) {
     // This is a new tag being created
-    handleTagCreate(value)
+    handleTagCreate(value, isEditMode)
   } else if (value && typeof value === 'object' && 'id' in value) {
     // This is an existing tag being selected - add to tags if not already there
-    if (!newItem.tags.some(t => t.id === value.id)) {
-      newItem.tags.push(value)
+    if (isEditMode) {
+      if (!editItem.tags.some(t => t.id === value.id)) {
+        editItem.tags.push(value)
+      }
+    } else {
+      if (!newItem.tags.some(t => t.id === value.id)) {
+        newItem.tags.push(value)
+      }
     }
   }
   tagsQuery.value = ''
 }
 
-async function handleTagCreate(tagName?: string) {
+async function handleTagCreate(tagName?: string, isEditMode = false) {
   const name = tagName || tagsQuery.value
   if (!name.trim()) return
   
   const newTag = await createTag(name)
   if (newTag) {
-    if (!newItem.tags.some(t => t.id === newTag.id)) {
-      newItem.tags.push(newTag)
+    if (isEditMode) {
+      if (!editItem.tags.some(t => t.id === newTag.id)) {
+        editItem.tags.push(newTag)
+      }
+    } else {
+      if (!newItem.tags.some(t => t.id === newTag.id)) {
+        newItem.tags.push(newTag)
+      }
     }
     tagsQuery.value = ''
   }
 }
 
-function removeTag(tagId: string) {
-  newItem.tags = newItem.tags.filter(t => t.id !== tagId)
+function removeTag(tagId: string, isEditMode = false) {
+  if (isEditMode) {
+    editItem.tags = editItem.tags.filter(t => t.id !== tagId)
+  } else {
+    newItem.tags = newItem.tags.filter(t => t.id !== tagId)
+  }
+}
+
+// Edit mode functions
+function startEditing(item: Budget) {
+  editingItemId.value = item.id
+  
+  // Copy item data to editItem
+  editItem.id = item.id
+  editItem.name = item.name
+  editItem.amount = item.amount
+  editItem.currency_code = item.currency_code
+  editItem.tags = [...item.tags]
+  editItem.period = item.period
+  editItem.is_one_time_purchase = item.is_one_time_purchase
+}
+
+function cancelEditing() {
+  editingItemId.value = null
+}
+
+async function saveEditedBudget() {
+  if (!user.value || !editItem.name || editItem.amount <= 0) return
+  
+  isLoading.value = true
+  
+  try {
+    // Prepare tag IDs for the junction table
+    const tagIds = editItem.tags.map(t => typeof t === 'object' && t.id ? t.id : t).filter(Boolean)
+    
+    // Update the budget without tags first
+    const budgetData = {
+      name: editItem.name,
+      amount: editItem.amount,
+      currency_code: editItem.currency_code,
+      period: editItem.period,
+      is_one_time_purchase: editItem.is_one_time_purchase,
+    }
+    
+    // Update the budget
+    const { error: updateError } = await client
+      .from('budgets')
+      .update(budgetData)
+      .eq('id', editItem.id)
+      .eq('user_id', user.value.id)
+    
+    if (updateError) throw updateError
+    
+    // Delete existing tag associations
+    const { error: deleteError } = await client
+      .from('budget_tags')
+      .delete()
+      .eq('budget_id', editItem.id)
+    
+    if (deleteError) throw deleteError
+    
+    // Insert new tag associations if there are any tags
+    if (tagIds.length > 0) {
+      const tagAssociations = tagIds.map(tagId => ({
+        budget_id: editItem.id,
+        tag_id: tagId
+      }))
+      
+      const { error: insertError } = await client
+        .from('budget_tags')
+        .insert(tagAssociations)
+      
+      if (insertError) throw insertError
+    }
+    
+    // Refresh budgets
+    await fetchBudgets()
+    
+    // Reset edit mode
+    editingItemId.value = null
+  } catch (err: any) {
+    error.value = err.message
+    console.error('Error updating budget:', err)
+  } finally {
+    isLoading.value = false
+  }
 }
 
 // Watchers
 watch([selectedMonth, selectedYear], () => {
   fetchBudgets()
+  // Cancel editing when changing month/year
+  editingItemId.value = null
 })
 
 // Lifecycle hooks
@@ -313,183 +423,317 @@ onMounted(() => {
     </div>
     
     <!-- Budget Items List -->
-    <Card>
-      <CardHeader>
-        <CardTitle>Budgets</CardTitle>
-        <CardDescription>
-          {{ months[selectedMonth] }} {{ selectedYear }}
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div v-if="isLoading" class="text-center py-4">
-          Loading...
-        </div>
-        
-        <div v-else-if="error" class="text-red-500 py-4">
-          {{ error }}
-        </div>
-        
-        <!-- <div v-else-if="budgets.length === 0" class="text-center py-4 text-gray-500">
-          No budgets found for this month.
-        </div> -->
-        
-        <div v-else class="space-y-4">
+    <div class="grid grid-cols-2 gap-4" style="grid-template-columns: 3fr 2fr;">
+      <Card>
+        <CardHeader>
+          <CardTitle>Budgets</CardTitle>
+          <CardDescription>
+            {{ months[selectedMonth] }} {{ selectedYear }}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div v-if="isLoading" class="text-center py-4">
+            Loading...
+          </div>
           
+          <div v-else-if="error" class="text-red-500 py-4">
+            {{ error }}
+          </div>
           
-          <!-- New Item Row -->
-          <Card class="bg-muted/50">
-            <CardContent class="pt-6">
-              <div class="grid grid-cols-6 gap-4">
-                <div>
-                  <form @submit.prevent="saveBudget" class="flex items-center space-x-2">
+          <!-- <div v-else-if="budgets.length === 0" class="text-center py-4 text-gray-500">
+            No budgets found for this month.
+          </div> -->
+          
+          <div v-else class="space-y-4">
+            
+            
+            <!-- New Item Row -->
+            <Card class="bg-muted/50">
+              <CardContent class="pt-6">
+                <div class="grid grid-cols-6 gap-4">
+                  <div>
+                    <form @submit.prevent="saveBudget" class="flex items-center space-x-2">
+                      <Input 
+                        v-model="newItem.name" 
+                        type="text" 
+                        placeholder="Item name" 
+                        class="w-full"
+                        required
+                      />
+                    </form>
+                  </div>
+                  <div>
                     <Input 
-                      v-model="newItem.name" 
+                      v-model="newItem.amount" 
+                      type="number" 
+                      min="0" 
+                      step="0.01" 
+                      placeholder="0.00" 
+                      class="w-full"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Select v-model="newItem.currency_code">
+                      <SelectTrigger class="w-full">
+                        <SelectValue :placeholder="newItem.currency_code" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem v-for="currency in CURRENCIES" :key="currency.value" :value="currency.value">
+                          {{ currency.label }} ({{ currency.symbol }})
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <div class="space-y-2">
+                      <Combobox 
+                        :ignore-filter="true" 
+                        v-model:open="openTagsCombobox"
+                      >
+                        <ComboboxAnchor as-child>
+                          <TagsInput v-model="newItem.tags" class="px-2 gap-2 w-full">
+                            <div class="flex gap-2 flex-wrap items-center">
+                              <TagsInputItem 
+                                v-for="tag in newItem.tags" 
+                                :key="tag.id" 
+                                :value="tag.name"
+                              >
+                                <TagsInputItemText />
+                                <TagsInputItemDelete @click="removeTag(tag.id)" />
+                              </TagsInputItem>
+                            </div>
+
+                            <ComboboxInput v-model="tagsQuery" as-child>
+                              <TagsInputInput 
+                                placeholder="Search or add tags..." 
+                                class="min-w-[120px] w-full p-0 border-none focus-visible:ring-0 h-auto" 
+                                @keydown.enter.prevent="tagsQuery.trim() && handleTagCreate()"
+                              />
+                            </ComboboxInput>
+                          </TagsInput>
+
+                          <ComboboxList class="w-[--reka-popper-anchor-width]">
+                            <ComboboxEmpty v-if="filteredTags.length === 0 && tagsQuery.trim()">
+                              <div class="p-2 text-sm">
+                                No tags found. Press Enter to create "{{ tagsQuery }}"
+                              </div>
+                            </ComboboxEmpty>
+                            <ComboboxGroup>
+                              <ComboboxItem
+                                v-for="tag in filteredTags" 
+                                :key="tag.id" 
+                                :value="tag"
+                                @select.prevent="(ev) => {
+                                  handleTagSelect(ev.detail.value)
+                                  
+                                  if (filteredTags.length === 0) {
+                                    openTagsCombobox = false
+                                  }
+                                }"
+                              >
+                                {{ tag.name }}
+                              </ComboboxItem>
+                            </ComboboxGroup>
+                          </ComboboxList>
+                        </ComboboxAnchor>
+                      </Combobox>
+                    </div>
+                  </div>
+                  <div class="flex items-center space-x-2">
+                    <div class="flex items-center space-x-2">
+                      <Checkbox 
+                        id="is-one-time" 
+                        v-model="newItem.is_one_time_purchase" 
+                      />
+                      <Label for="is-one-time" class="text-sm">One-time purchase</Label>
+                    </div>
+                  </div>
+                  <div>
+                    <Button 
+                      type="submit" 
+                      size="sm" 
+                      :disabled="isLoading || !newItem.name || newItem.amount <= 0"
+                      @click.prevent="saveBudget()"
+                    >
+                      {{ isLoading ? 'Saving...' : 'Add' }}
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <!-- Existing Items -->
+            <Card 
+              v-for="item in budgets" 
+              :key="item.id" 
+              class="hover:bg-accent/5 transition-colors"
+              :class="{ 'border-primary': editingItemId === item.id }"
+            >
+              <CardContent class="pt-6">
+                <!-- View Mode -->
+                <div v-if="editingItemId !== item.id" class="grid grid-cols-6 gap-4">
+                  <div class="font-medium">{{ item.name }}</div>
+                  <div>{{ item.amount.toFixed(2) }}</div>
+                  <div>
+                    {{ CURRENCIES.find(c => c.value === item.currency_code)?.symbol || item.currency_code }}
+                    <span v-if="item.is_one_time_purchase" class="ml-1 text-xs bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded-sm">One-time</span>
+                  </div>
+                  <div>
+                    <div class="flex flex-wrap gap-1">
+                      <span 
+                        v-for="tag in item.tags" 
+                        :key="tag.id" 
+                        class="bg-blue-100 text-blue-800 px-2 py-0.5 text-xs rounded-md"
+                      >
+                        {{ tag.name }}
+                      </span>
+                    </div>
+                  </div>
+                  <div></div>
+                  <div class="flex space-x-2">
+                    <Button variant="outline" size="sm" @click="startEditing(item)">Edit</Button>
+                  </div>
+                </div>
+                
+                <!-- Edit Mode -->
+                <div v-else-if="editingItemId === item.id" class="grid grid-cols-6 gap-4">
+                  <div>
+                    <Input 
+                      v-model="editItem.name" 
                       type="text" 
                       placeholder="Item name" 
                       class="w-full"
                       required
                     />
-                  </form>
-                </div>
-                <div>
-                  <Input 
-                    v-model="newItem.amount" 
-                    type="number" 
-                    min="0" 
-                    step="0.01" 
-                    placeholder="0.00" 
-                    class="w-full"
-                    required
-                  />
-                </div>
-                <div>
-                  <Select v-model="newItem.currency_code">
-                    <SelectTrigger class="w-full">
-                      <SelectValue :placeholder="newItem.currency_code" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem v-for="currency in CURRENCIES" :key="currency.value" :value="currency.value">
-                        {{ currency.label }} ({{ currency.symbol }})
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <div class="space-y-2">
-                    <Combobox 
-                      :ignore-filter="true" 
-                      v-model:open="openTagsCombobox"
-                    >
-                      <ComboboxAnchor as-child>
-                        <TagsInput v-model="newItem.tags" class="px-2 gap-2 w-full">
-                          <div class="flex gap-2 flex-wrap items-center">
-                            <TagsInputItem 
-                              v-for="tag in newItem.tags" 
-                              :key="tag.id" 
-                              :value="tag.name"
-                            >
-                              <TagsInputItemText />
-                              <TagsInputItemDelete @click="removeTag(tag.id)" />
-                            </TagsInputItem>
-                          </div>
-
-                          <ComboboxInput v-model="tagsQuery" as-child>
-                            <TagsInputInput 
-                              placeholder="Search or add tags..." 
-                              class="min-w-[120px] w-full p-0 border-none focus-visible:ring-0 h-auto" 
-                              @keydown.enter.prevent="tagsQuery.trim() && handleTagCreate()"
-                            />
-                          </ComboboxInput>
-                        </TagsInput>
-
-                        <ComboboxList class="w-[--reka-popper-anchor-width]">
-                          <ComboboxEmpty v-if="filteredTags.length === 0 && tagsQuery.trim()">
-                            <div class="p-2 text-sm">
-                              No tags found. Press Enter to create "{{ tagsQuery }}"
-                            </div>
-                          </ComboboxEmpty>
-                          <ComboboxGroup>
-                            <ComboboxItem
-                              v-for="tag in filteredTags" 
-                              :key="tag.id" 
-                              :value="tag"
-                              @select.prevent="(ev) => {
-                                handleTagSelect(ev.detail.value)
-                                
-                                if (filteredTags.length === 0) {
-                                  openTagsCombobox = false
-                                }
-                              }"
-                            >
-                              {{ tag.name }}
-                            </ComboboxItem>
-                          </ComboboxGroup>
-                        </ComboboxList>
-                      </ComboboxAnchor>
-                    </Combobox>
                   </div>
-                </div>
-                <div class="flex items-center space-x-2">
-                  <div class="flex items-center space-x-2">
-                    <Checkbox 
-                      id="is-one-time" 
-                      v-model="newItem.is_one_time_purchase" 
+                  <div>
+                    <Input 
+                      v-model="editItem.amount" 
+                      type="number" 
+                      min="0" 
+                      step="0.01" 
+                      placeholder="0.00" 
+                      class="w-full"
+                      required
                     />
-                    <Label for="is-one-time" class="text-sm">One-time purchase</Label>
                   </div>
-                </div>
-                <div>
-                  <Button 
-                    type="submit" 
-                    size="sm" 
-                    :disabled="isLoading || !newItem.name || newItem.amount <= 0"
-                    @click.prevent="saveBudget()"
-                  >
-                    {{ isLoading ? 'Saving...' : 'Add' }}
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <!-- Existing Items -->
-          <Card 
-            v-for="item in budgets" 
-            :key="item.id" 
-            class="hover:bg-accent/5 transition-colors"
-          >
-            <CardContent class="pt-6">
-              <div class="grid grid-cols-6 gap-4">
-                <div class="font-medium">{{ item.name }}</div>
-                <div>{{ item.amount.toFixed(2) }}</div>
-                <div>
-                  {{ CURRENCIES.find(c => c.value === item.currency_code)?.symbol || item.currency_code }}
-                  <span v-if="item.is_one_time_purchase" class="ml-1 text-xs bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded-sm">One-time</span>
-                </div>
-                <div>
-                  <div class="flex flex-wrap gap-1">
-                    <span 
-                      v-for="tag in item.tags" 
-                      :key="tag.id" 
-                      class="bg-blue-100 text-blue-800 px-2 py-0.5 text-xs rounded-md"
+                  <div>
+                    <Select v-model="editItem.currency_code">
+                      <SelectTrigger class="w-full">
+                        <SelectValue :placeholder="editItem.currency_code" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem v-for="currency in CURRENCIES" :key="currency.value" :value="currency.value">
+                          {{ currency.label }} ({{ currency.symbol }})
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <div class="space-y-2">
+                      <Combobox 
+                        :ignore-filter="true" 
+                      >
+                        <ComboboxAnchor as-child>
+                          <TagsInput v-model="editItem.tags" class="px-2 gap-2 w-full">
+                            <div class="flex gap-2 flex-wrap items-center">
+                              <TagsInputItem 
+                                v-for="tag in editItem.tags" 
+                                :key="tag.id" 
+                                :value="tag.name"
+                              >
+                                <TagsInputItemText />
+                                <TagsInputItemDelete @click="removeTag(tag.id, true)" />
+                              </TagsInputItem>
+                            </div>
+
+                            <ComboboxInput v-model="tagsQuery" as-child>
+                              <TagsInputInput 
+                                placeholder="Search or add tags..." 
+                                class="min-w-[120px] w-full p-0 border-none focus-visible:ring-0 h-auto" 
+                                @keydown.enter.prevent="tagsQuery.trim() && handleTagCreate(undefined, true)"
+                              />
+                            </ComboboxInput>
+                          </TagsInput>
+
+                          <ComboboxList class="w-[--reka-popper-anchor-width]">
+                            <ComboboxEmpty v-if="filteredTags.length === 0 && tagsQuery.trim()">
+                              <div class="p-2 text-sm">
+                                No tags found. Press Enter to create "{{ tagsQuery }}"
+                              </div>
+                            </ComboboxEmpty>
+                            <ComboboxGroup>
+                              <ComboboxItem
+                                v-for="tag in filteredTags" 
+                                :key="tag.id" 
+                                :value="tag"
+                                @select.prevent="(ev) => handleTagSelect(ev.detail.value, true)"
+                              >
+                                {{ tag.name }}
+                              </ComboboxItem>
+                            </ComboboxGroup>
+                          </ComboboxList>
+                        </ComboboxAnchor>
+                      </Combobox>
+                    </div>
+                  </div>
+                  <div class="flex items-center space-x-2">
+                    <div class="flex items-center space-x-2">
+                      <Checkbox 
+                        id="edit-is-one-time" 
+                        v-model="editItem.is_one_time_purchase" 
+                      />
+                      <Label for="edit-is-one-time" class="text-sm">One-time purchase</Label>
+                    </div>
+                  </div>
+                  <div class="flex space-x-2">
+                    <Button 
+                      type="submit" 
+                      size="sm" 
+                      variant="default"
+                      :disabled="isLoading || !editItem.name || editItem.amount <= 0"
+                      @click="saveEditedBudget()"
                     >
-                      {{ tag.name }}
-                    </span>
+                      {{ isLoading ? 'Saving...' : 'Save' }}
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      @click="cancelEditing()"
+                    >
+                      Cancel
+                    </Button>
                   </div>
                 </div>
-                <div>
-                  <Button variant="outline" size="sm">Edit</Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <!-- Empty State -->
-          <div v-if="budgets.length === 0" class="text-center py-8 text-muted-foreground">
-            No budget items found for this month. Add your first item above.
+              </CardContent>
+            </Card>
+            
+            <!-- Empty State -->
+            <div v-if="budgets.length === 0" class="text-center py-8 text-muted-foreground">
+              No budget items found for this month. Add your first item above.
+            </div>
           </div>
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Budgets</CardTitle>
+          <CardDescription>
+            Period info
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <WidgetsBudgetInfo :budgets="budgets" :tags="tags" />
+          
+          
+
+
+          <!-- budget sum info -->
+        </CardContent>
+      </Card>
+     </div>
+    
   </div>
 </template>

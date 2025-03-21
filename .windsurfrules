@@ -41,7 +41,9 @@ This is a expense tracker and budgeting app.
   - <style lang="scss">
 - Do not import ref, watch, compoted or any other vue/nuxt specific functions. It's already auto imported.
 - Use `defineProps` for component props with IProps interface.
-- Use `defineEmits` for component events with IEvents interface..
+- Use `defineEmits` for component events with IEvents interface.
+- DO NOT use nuxt 2 template filters
+
 
 # LIBS
 
