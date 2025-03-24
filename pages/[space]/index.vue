@@ -2,7 +2,7 @@
 const { getSpace } = useSpace()
 
 const spaceId = useRoute().params.space as string
-const { space, members } = await getSpace(Number(spaceId))
+const space = await getSpace(Number(spaceId))
 </script>
 
 <template>
@@ -15,9 +15,8 @@ const { space, members } = await getSpace(Number(spaceId))
 					<CardTitle>Space members</CardTitle>
 				</CardHeader>
 				<CardContent>
-					<pre>{{ members }}</pre>
 					<ul>
-						<li v-for="member in members" :key="member.user_id">- {{ member.display_name }}</li>
+						<li v-for="member in space.members" :key="member.user_id">- {{ member.name }}</li>
 					</ul>
 				</CardContent>
 			</Card>

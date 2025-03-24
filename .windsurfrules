@@ -44,7 +44,6 @@ This is a expense tracker and budgeting app.
 - Use `defineEmits` for component events with IEvents interface.
 - DO NOT use nuxt 2 template filters
 
-
 # LIBS
 
 - Use tailwindcss for styling.
@@ -52,3 +51,10 @@ This is a expense tracker and budgeting app.
 - Use @nuxtjs/supabase for database operations.
 - Use @vueuse/core for utilities when possible.
 
+# Database
+
+- Use Supabase for database operations.
+- Use the `useSupabase` composable to access the Supabase client.
+- Use the `useSupabaseUser` composable to access the current user.
+- Use the `useSupabaseClient` composable to access the Supabase client in the file.
+- /supabase/migrations/ - Use this directory for database migrations.

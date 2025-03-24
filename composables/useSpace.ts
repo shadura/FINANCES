@@ -12,17 +12,12 @@ const useSpace = () => {
 		return data
 	}
 
-	const getSpace = async (spaceId: number): Promise<{ space: Space; members: SpaceUser[] }> => {
-		const { data: space, error: spaceError } = await supabase.from('spaces').select('*').eq('id', spaceId).single()
-		const { data: members, error: membersError } = await supabase
-			.from('spaces_users')
-			.select('*')
-			.eq('space_id', spaceId)
+	const getSpace = async (spaceId: number): Promise<Space> => {
+		const { data: space, error: spaceError } = await supabase.rpc('get_space_with_members', { input_space_id: spaceId })
 
 		if (spaceError) throw spaceError
-		if (membersError) throw membersError
 
-		return { space, members }
+		return space?.[0] || null
 	}
 
 	return {

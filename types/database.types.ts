@@ -64,7 +64,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      user_has_space_access: {
+        Args: {
+          p_space_id: number
+          p_user_uuid: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never
