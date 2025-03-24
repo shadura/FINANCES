@@ -1,11 +1,10 @@
-<script setup lang="ts">
-import { getUserSpaces } from '~/api/spaces'
-
+<script lang="ts" setup>
 definePageMeta({
 	layout: 'clean',
 })
 
-const spaces = await getUserSpaces()
+const { getList } = useSpace()
+const spaces = await getList()
 </script>
 
 <template>

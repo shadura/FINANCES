@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { getSpaceMembers } from '~/api/spaces'
+const { getSpace } = useSpace()
 
 const spaceId = useRoute().params.space as string
-const members = await getSpaceMembers(spaceId)
+const { space, members } = await getSpace(Number(spaceId))
 </script>
 
 <template>
 	<div>
-		<h1 class="text-2xl font-bold">Space dashboard</h1>
+		<h1 class="text-2xl font-bold">{{ space.name }} - Space dashboard</h1>
 
 		<div class="mt-6">
 			<Card>
@@ -15,6 +15,7 @@ const members = await getSpaceMembers(spaceId)
 					<CardTitle>Space members</CardTitle>
 				</CardHeader>
 				<CardContent>
+					<pre>{{ members }}</pre>
 					<ul>
 						<li v-for="member in members" :key="member.user_id">- {{ member.display_name }}</li>
 					</ul>
