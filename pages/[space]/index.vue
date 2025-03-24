@@ -1,7 +1,8 @@
 <script setup lang="ts">
-// const props = defineProps<{
+import { getSpaceMembers } from '~/api/spaces'
 
-// }>()
+const spaceId = useRoute().params.space as string
+const members = await getSpaceMembers(spaceId)
 </script>
 
 <template>
@@ -13,6 +14,11 @@
 				<CardHeader>
 					<CardTitle>Space members</CardTitle>
 				</CardHeader>
+				<CardContent>
+					<ul>
+						<li v-for="member in members" :key="member.user_id">- {{ member.display_name }}</li>
+					</ul>
+				</CardContent>
 			</Card>
 		</div>
 	</div>
