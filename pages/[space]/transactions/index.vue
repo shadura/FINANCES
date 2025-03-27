@@ -1,0 +1,11 @@
+<script setup lang="ts"></script>
+
+<template>
+	<div>
+		<h1 class="text-2xl font-bold">Transactions</h1>
+
+		<div class="mt-8">
+			<WidgetsTransactionsList />
+		</div>
+	</div>
+</template>

@@ -1,0 +1,12 @@
+<script setup lang="ts"></script>
+
+<template>
+	<div>
+		<h1 class="text-2xl font-bold">Settings</h1>
+
+		<div class="grid grid-cols-2 gap-4 mt-8">
+			<WidgetsAccountsList />
+			<WidgetsTagsList />
+		</div>
+	</div>
+</template>

@@ -1,31 +1,49 @@
 <script setup lang="ts">
-import { CalendarSync, Wallet, Settings, ChevronUp, ChartCandlestick, Carrot, User2 } from 'lucide-vue-next'
+import {
+	CalendarSync,
+	Wallet,
+	Settings,
+	ChevronUp,
+	ChartCandlestick,
+	Focus,
+	User2,
+	ArrowLeftRight,
+} from 'lucide-vue-next'
+
+const space = computed(() => Number(useRoute().params.space))
 
 // Menu items.
 const items = [
 	{
-		title: 'Budget',
-		url: '/budget',
+		title: 'Dashboard',
+		url: `/${space.value}`,
+		icon: Focus,
+	},
+	{
+		title: 'Planner',
+		url: `/${space.value}/planner`,
 		icon: Wallet,
 	},
 	{
-		title: 'Net Worth',
-		url: '/net-worth',
-		icon: ChartCandlestick,
+		title: 'Transactions',
+		url: `/${space.value}/transactions`,
+		icon: ArrowLeftRight,
 	},
 	{
 		title: 'Subscriptions',
-		url: '/subscriptions',
+		url: `/${space.value}/subscriptions`,
 		icon: CalendarSync,
+		soon: true,
 	},
 	{
-		title: 'Menu',
-		url: '/menu',
-		icon: Carrot,
+		title: 'Reports',
+		url: `/${space.value}/reports`,
+		icon: ChartCandlestick,
+		soon: true,
 	},
 	{
 		title: 'Space Settings',
-		url: '/settings',
+		url: `/${space.value}/settings`,
 		icon: Settings,
 	},
 ]
@@ -48,15 +66,16 @@ const signOut = async () => {
 		</SidebarHeader>
 		<SidebarContent>
 			<SidebarGroup>
-				<SidebarGroupLabel>Modules</SidebarGroupLabel>
+				<SidebarGroupLabel>Navigation</SidebarGroupLabel>
 				<SidebarGroupContent>
 					<SidebarMenu>
 						<SidebarMenuItem v-for="item in items" :key="item.title">
 							<SidebarMenuButton asChild>
-								<a :href="item.url">
+								<nuxt-link :to="item.url">
 									<component :is="item.icon" />
 									<span>{{ item.title }}</span>
-								</a>
+									<span v-if="item.soon" class="text-xs text-gray-500 bg-gray-200 rounded-lg px-1 py-0.5">soon</span>
+								</nuxt-link>
 							</SidebarMenuButton>
 						</SidebarMenuItem>
 					</SidebarMenu>

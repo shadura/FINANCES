@@ -9,6 +9,47 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      accounts: {
+        Row: {
+          balance: number | null
+          created_at: string
+          currency: string
+          deleted: boolean | null
+          id: number
+          name: string
+          space_id: number
+          type: string
+        }
+        Insert: {
+          balance?: number | null
+          created_at?: string
+          currency: string
+          deleted?: boolean | null
+          id?: number
+          name: string
+          space_id: number
+          type: string
+        }
+        Update: {
+          balance?: number | null
+          created_at?: string
+          currency?: string
+          deleted?: boolean | null
+          id?: number
+          name?: string
+          space_id?: number
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "accounts_space_id_fkey"
+            columns: ["space_id"]
+            isOneToOne: false
+            referencedRelation: "spaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       spaces: {
         Row: {
           created_at: string
@@ -59,11 +100,162 @@ export type Database = {
           },
         ]
       }
+      tags: {
+        Row: {
+          color: string
+          created_at: string
+          deleted: boolean | null
+          id: number
+          name: string
+          space_id: number
+        }
+        Insert: {
+          color?: string
+          created_at?: string
+          deleted?: boolean | null
+          id?: number
+          name: string
+          space_id: number
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          deleted?: boolean | null
+          id?: number
+          name?: string
+          space_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tags_space_id_fkey"
+            columns: ["space_id"]
+            isOneToOne: false
+            referencedRelation: "spaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      transaction_tags: {
+        Row: {
+          id: number
+          space_id: number
+          tag_id: number
+          transaction_id: number
+        }
+        Insert: {
+          id?: number
+          space_id: number
+          tag_id: number
+          transaction_id: number
+        }
+        Update: {
+          id?: number
+          space_id?: number
+          tag_id?: number
+          transaction_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transaction_tags_space_id_fkey"
+            columns: ["space_id"]
+            isOneToOne: false
+            referencedRelation: "spaces"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transaction_tags_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "tags"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transaction_tags_transaction_id_fkey"
+            columns: ["transaction_id"]
+            isOneToOne: false
+            referencedRelation: "transactions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      transactions: {
+        Row: {
+          account_from: number | null
+          account_to: number | null
+          amount_credit: number | null
+          amount_debit: number | null
+          created_at: string
+          date: string
+          description: string | null
+          id: number
+          space_id: number
+          type: string
+        }
+        Insert: {
+          account_from?: number | null
+          account_to?: number | null
+          amount_credit?: number | null
+          amount_debit?: number | null
+          created_at?: string
+          date?: string
+          description?: string | null
+          id?: number
+          space_id: number
+          type: string
+        }
+        Update: {
+          account_from?: number | null
+          account_to?: number | null
+          amount_credit?: number | null
+          amount_debit?: number | null
+          created_at?: string
+          date?: string
+          description?: string | null
+          id?: number
+          space_id?: number
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transactions_account_from_fkey"
+            columns: ["account_from"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transactions_account_to_fkey"
+            columns: ["account_to"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transactions_space_id_fkey"
+            columns: ["space_id"]
+            isOneToOne: false
+            referencedRelation: "spaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      get_space_with_members: {
+        Args: {
+          input_space_id: number
+        }
+        Returns: {
+          id: number
+          name: string
+          created_at: string
+          created_by: string
+          members: Json
+        }[]
+      }
       user_has_space_access: {
         Args: {
           p_space_id: number
