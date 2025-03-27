@@ -1,17 +1,9 @@
 <script setup lang="ts">
-import type { DB } from '~/types/index.types'
+import type { Account, Tag, Transaction, TransactionWithTags } from '~/types/index.types'
 import { useFilter } from 'reka-ui'
 import { ETransactionType, transactionTypeArray } from '@/types/enums/transaction'
 import { Loader2 } from 'lucide-vue-next'
 import { type DateValue, now, getLocalTimeZone, parseZonedDateTime } from '@internationalized/date'
-
-type Transaction = DB<'transactions'>
-type Account = DB<'accounts'>
-type Tag = DB<'tags'>
-
-type TransactionTags = DB<'transaction_tags'>
-
-type TransactionWithTags = Transaction & { transaction_tags: { tag_id: number; tags: Tag }[] }
 
 const props = defineProps<{
 	numericSpaceId: number
@@ -84,10 +76,6 @@ const handleUpdateType = () => {
 		editItem.value.account_to = null
 		editItem.value.amount_credit = 0
 	}
-
-	if (editItem.value.type === ETransactionType.ADJUST) {
-		// handleUpdateAccountTo()
-	}
 }
 
 const handleUpdateAccountFrom = () => {}
@@ -137,8 +125,9 @@ const handleSelectTag = (ev: any) => {
 	}
 }
 
-const handleRemoveTag = (ev: any) => {
-	console.log('handleRemoveTag', ev)
+const tagsToBeRemoved = ref<ITag[]>([])
+const handleRemoveTag = (tag: ITag) => {
+	if (tag.existed) tagsToBeRemoved.value.push(tag)
 }
 
 const handleAddTag = (ev: any) => {
@@ -146,13 +135,14 @@ const handleAddTag = (ev: any) => {
 }
 
 // TODO: Remove tag api
-const handleRemoveTagAPI = async (transaction_id: number, tag_id: number) => {
-	selectedTags.value = selectedTags.value.filter((t) => t.id !== tag_id)
-
-	const { error } = await supabase.from('transaction_tags').delete().match({
-		transaction_id,
-		tag_id,
-	})
+const deleteTagsRelationship = async (transaction_id: number, tags: ITag[]) => {
+	const { error } = await supabase
+		.from('transaction_tags')
+		.delete()
+		.match({
+			transaction_id,
+			tag_id: tags.map((t) => t.id),
+		})
 
 	if (error) {
 		console.error('Failed to remove tag', error)
@@ -163,6 +153,7 @@ const handleRemoveTagAPI = async (transaction_id: number, tag_id: number) => {
 const createTagsRelationship = async (transaction_id: number, tags: ITag[]) => {
 	const filteredTags = tags.reduce((acc, item) => {
 		if (acc.some((i) => i.id === item.id)) return acc
+		if (item.existed) return acc
 
 		return [...acc, item]
 	}, [] as ITag[])
@@ -181,9 +172,9 @@ const isLoading = ref(false)
 
 const formatForm = (form: TransactionForm) => {
 	return {
-		...editItem.value,
+		...form,
 		space_id: props.numericSpaceId,
-		date: editItem.value.date.toDate(getLocalTimeZone()),
+		date: form.date.toDate(getLocalTimeZone()),
 	}
 }
 
@@ -193,7 +184,9 @@ const createTransaction = async () => {
 	try {
 		isLoading.value = true
 
-		const { data } = await supabase.from('transactions').insert(formatForm(editItem.value)).select('id').single()
+		const formated = formatForm(editItem.value)
+
+		const { data } = await supabase.from('transactions').insert(formated).select('id').single()
 
 		const transaction_id = data?.id
 		if (transaction_id && selectedTags.value.length) {
@@ -252,6 +245,10 @@ const editTransaction = async (id: number) => {
 
 		if (props.transaction?.id && selectedTags.value.length) {
 			createTagsRelationship(props.transaction.id, selectedTags.value)
+		}
+
+		if (props.transaction?.id && tagsToBeRemoved.value.length) {
+			await deleteTagsRelationship(props.transaction.id, tagsToBeRemoved.value)
 		}
 	} catch (err) {
 		console.error('error:', err)

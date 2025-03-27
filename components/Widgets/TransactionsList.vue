@@ -1,10 +1,8 @@
 <script setup lang="ts">
 import { Edit, Trash, ChevronUp, ChevronDown, MoveHorizontal, Scale } from 'lucide-vue-next'
-import type { DB } from '~/types/index.types'
+import type { Account, Tag, TransactionWithTags } from '~/types/index.types'
 import { ETransactionType } from '~/types/enums/transaction'
-
-type Account = DB<'accounts'>
-type Tag = DB<'tags'>
+import dayjs from 'dayjs'
 
 const numericSpaceId = Number(useRoute().params.space)
 
@@ -44,10 +42,10 @@ const { data, refresh } = useAsyncData('transactions', async () => {
 		`,
 		)
 		.eq('space_id', numericSpaceId)
-		.order('date', { ascending: false })
+		.order('created_at', { ascending: false })
 
 	if (error) throw error
-	return data
+	return data as unknown as TransactionWithTags[]
 })
 
 const deleteTransaction = async (id: number) => {
@@ -95,6 +93,7 @@ const getAccountCurrency = (id: number | null) => {
 						<TableHead> Account </TableHead>
 						<TableHead>Amount</TableHead>
 						<TableHead>Tags</TableHead>
+						<TableHead>Date</TableHead>
 						<TableHead class="text-right w-[100px]"> Actions </TableHead>
 					</TableRow>
 				</TableHeader>
@@ -142,6 +141,11 @@ const getAccountCurrency = (id: number | null) => {
 								</Badge>
 							</div>
 						</TableCell>
+
+						<TableCell>
+							{{ dayjs(transaction.created_at).format('DD MMM HH:mm') }}
+						</TableCell>
+
 						<TableCell class="text-right">
 							<div class="flex gap-1 justify-end">
 								<Popover>
