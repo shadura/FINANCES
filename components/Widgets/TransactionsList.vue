@@ -143,7 +143,7 @@ const getAccountCurrency = (id: number | null) => {
 						</TableCell>
 
 						<TableCell>
-							{{ dayjs(transaction.created_at).format('DD MMM HH:mm') }}
+							{{ dayjs(transaction.created_at).format('DD MMM') }}
 						</TableCell>
 
 						<TableCell class="text-right">
