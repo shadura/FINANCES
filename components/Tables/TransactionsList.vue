@@ -110,7 +110,7 @@ const deleteTransaction = async (id: number) => {
 						</TableCell>
 
 						<TableCell>
-							{{ dayjs(transaction.created_at).format('DD MMM') }}
+							{{ dayjs(transaction.date).format('DD MMM') }}
 						</TableCell>
 
 						<TableCell class="text-right">
