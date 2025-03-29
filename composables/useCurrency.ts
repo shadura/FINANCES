@@ -9,6 +9,8 @@ const useCurrency = () => {
 		}
 	})
 
+	// adsfsdf
+
 	const convert = (amount: number, from: ECurrency, to: ECurrency) => {
 		if (from === to) return amount
 		if (!currentCurrencyRates.value[from] || !currentCurrencyRates.value[to]) return amount
