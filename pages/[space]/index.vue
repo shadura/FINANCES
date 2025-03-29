@@ -17,7 +17,9 @@ onMounted(() => {
 				<WidgetsAccountsInfo class="mt-4" />
 			</div>
 
-			<div></div>
+			<div>
+				<WidgetsNetWorthLine />
+			</div>
 
 			<!-- <div>
 				<pre>{{ getNetWorhInfo }}</pre>
