@@ -3,6 +3,8 @@ import ApexCharts from 'apexcharts'
 import type { ECurrency } from '@/types/enums/currency'
 import { COLORS } from '@/const/colors.const'
 
+const { convert } = useCurrency()
+
 const props = defineProps<{
 	data: {
 		amount: {
@@ -61,7 +63,7 @@ const getChartOptions = () => {
 						total: {
 							showAlways: true,
 							show: true,
-							label: 'Net Worth',
+							label: `${useFormatAmount(props.data.amount.secondary.value, props.data.amount.secondary.currency)}`,
 							fontFamily: 'ui-sans-serif, system-ui, sans-serif',
 
 							formatter: function () {
