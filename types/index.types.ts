@@ -6,5 +6,8 @@ export type Transaction = DB<'transactions'>
 export type Account = DB<'accounts'>
 export type Tag = DB<'tags'>
 export type TransactionTags = DB<'transaction_tags'>
+export type Plan = DB<'plans'>
+export type PlanTags = DB<'plan_tags'>
 
 export type TransactionWithTags = Transaction & { transaction_tags: { tag_id: number; tags: Tag }[] }
+export type PlanWithTags = Plan & { plan_tags: { tag_id: number; tags: Tag }[] }

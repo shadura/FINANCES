@@ -11,6 +11,7 @@ const emit = defineEmits(['sent'])
 
 const editItem = ref({
 	name: '',
+	color: '',
 })
 
 const isDisabled = computed(() => !editItem.value.name)
@@ -21,6 +22,7 @@ const setTagData = () => {
 	if (props.tag) {
 		editItem.value = {
 			name: props.tag.name,
+			color: props.tag.color,
 		}
 	}
 }
@@ -38,6 +40,7 @@ const createTag = async () => {
 
 	editItem.value = {
 		name: '',
+		color: '',
 	}
 }
 
@@ -71,6 +74,9 @@ const handleSubmitForm = async () => {
 			<div>
 				<div class="mb-2">
 					<Input id="name" type="text" v-model="editItem.name" class="col-span-2 h-8" placeholder="Name" />
+				</div>
+				<div class="mb-2">
+					<Input id="color" type="text" v-model="editItem.color" class="col-span-2 h-8" placeholder="Color" />
 				</div>
 				<Button type="submit" class="col-span-2 h-8 w-full" :disabled="isDisabled">Save</Button>
 			</div>

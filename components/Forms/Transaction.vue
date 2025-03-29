@@ -114,7 +114,6 @@ const filteredTags = computed(() => {
 })
 
 const handleSelectTag = (ev: any) => {
-	console.log('handleSelectTag', ev)
 	if (typeof ev.detail.value) {
 		searchTerm.value = ''
 		selectedTags.value.push(ev.detail.value)
@@ -134,7 +133,6 @@ const handleAddTag = (ev: any) => {
 	console.log('handleAddTag', ev)
 }
 
-// TODO: Remove tag api
 const deleteTagsRelationship = async (transaction_id: number, tags: ITag[]) => {
 	const { error } = await supabase
 		.from('transaction_tags')
@@ -171,10 +169,30 @@ const createTagsRelationship = async (transaction_id: number, tags: ITag[]) => {
 const isLoading = ref(false)
 
 const formatForm = (form: TransactionForm) => {
+	let amount_credit = form.amount_credit
+
+	// ? get difference to add as adjustment
+	if (form.type === ETransactionType.ADJUST && !props.transaction?.id) {
+		const account = props.accountList?.find((account) => account.id === form.account_to)
+		if (!account || account.balance === null) return
+
+		amount_credit = amount_credit - account.balance
+	}
+
+	if (form.type === ETransactionType.ADJUST && props.transaction?.id) {
+		const account = props.accountList?.find((account) => account.id === form.account_to)
+		if (!account || account.balance === null) return
+
+		const originalBalanceBeforeAdjustment = account.balance - (props.transaction?.amount_credit || 0)
+
+		amount_credit = amount_credit - originalBalanceBeforeAdjustment
+	}
+
 	return {
 		...form,
 		space_id: props.numericSpaceId,
 		date: form.date.toDate(getLocalTimeZone()),
+		amount_credit,
 	}
 }
 
@@ -190,7 +208,7 @@ const createTransaction = async () => {
 
 		const transaction_id = data?.id
 		if (transaction_id && selectedTags.value.length) {
-			createTagsRelationship(transaction_id, selectedTags.value)
+			await createTagsRelationship(transaction_id, selectedTags.value)
 		}
 
 		editItem.value = { ...clearTransaction }
@@ -210,12 +228,21 @@ const setTransactionData = () => {
 		const fixed = iso.replace('Z', `[${getLocalTimeZone()}]`)
 		const zoned = parseZonedDateTime(fixed)
 
+		const transactionAccountToId = props.transaction.account_to
+		const transactionAccountToBalance =
+			props.accountList?.length && transactionAccountToId
+				? props.accountList.find((account) => account.id === transactionAccountToId)?.balance || 0
+				: 0
+
 		editItem.value = {
 			type: (props.transaction.type || ETransactionType.EXPENSE) as ETransactionType,
 			account_from: props.transaction.account_from || null,
 			account_to: props.transaction.account_to || null,
 			amount_debit: props.transaction.amount_debit || 0,
-			amount_credit: props.transaction.amount_credit || 0,
+			amount_credit:
+				props.transaction.type === ETransactionType.ADJUST
+					? transactionAccountToBalance
+					: props.transaction.amount_credit || 0,
 			description: props.transaction.description || '',
 			date: zoned,
 		}
@@ -237,14 +264,13 @@ onMounted(() => {
 })
 const editTransaction = async (id: number) => {
 	if (isDisabled.value) return
+	isLoading.value = true
 
 	try {
-		isLoading.value = true
-
 		await supabase.from('transactions').update(formatForm(editItem.value)).eq('id', id)
 
 		if (props.transaction?.id && selectedTags.value.length) {
-			createTagsRelationship(props.transaction.id, selectedTags.value)
+			await createTagsRelationship(props.transaction.id, selectedTags.value)
 		}
 
 		if (props.transaction?.id && tagsToBeRemoved.value.length) {

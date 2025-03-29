@@ -44,16 +44,16 @@ const deleteTag = async (id: number) => {
 				<TableHeader>
 					<TableRow>
 						<TableHead> Name </TableHead>
-						<TableHead> Color </TableHead>
 						<TableHead class="text-right w-[100px]"> Actions </TableHead>
 					</TableRow>
 				</TableHeader>
 				<TableBody>
 					<TableRow v-for="tag in data" :key="tag.id">
 						<TableCell class="font-medium">
-							{{ tag.name }}
+							<Tag :color="tag.color">
+								{{ tag.name }}
+							</Tag>
 						</TableCell>
-						<TableCell>{{ tag.color }}</TableCell>
 						<TableCell class="text-right">
 							<div class="flex gap-1 justify-end">
 								<Popover>

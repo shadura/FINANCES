@@ -16,6 +16,7 @@ export type Database = {
           currency: string
           deleted: boolean | null
           id: number
+          is_net_worth: boolean
           name: string
           space_id: number
           type: string
@@ -26,6 +27,7 @@ export type Database = {
           currency: string
           deleted?: boolean | null
           id?: number
+          is_net_worth?: boolean
           name: string
           space_id: number
           type: string
@@ -36,6 +38,7 @@ export type Database = {
           currency?: string
           deleted?: boolean | null
           id?: number
+          is_net_worth?: boolean
           name?: string
           space_id?: number
           type?: string
@@ -43,6 +46,87 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "accounts_space_id_fkey"
+            columns: ["space_id"]
+            isOneToOne: false
+            referencedRelation: "spaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      plan_tags: {
+        Row: {
+          id: number
+          plan_id: number
+          space_id: number
+          tag_id: number
+        }
+        Insert: {
+          id?: number
+          plan_id: number
+          space_id: number
+          tag_id: number
+        }
+        Update: {
+          id?: number
+          plan_id?: number
+          space_id?: number
+          tag_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "plan_tags_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "plans"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "plan_tags_space_id_fkey"
+            columns: ["space_id"]
+            isOneToOne: false
+            referencedRelation: "spaces"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "plan_tags_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "tags"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      plans: {
+        Row: {
+          amount: number
+          created_at: string
+          currency: string | null
+          description: string | null
+          id: number
+          period_month_year: number
+          space_id: number
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          currency?: string | null
+          description?: string | null
+          id?: number
+          period_month_year: number
+          space_id: number
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency?: string | null
+          description?: string | null
+          id?: number
+          period_month_year?: number
+          space_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "plans_space_id_fkey"
             columns: ["space_id"]
             isOneToOne: false
             referencedRelation: "spaces"

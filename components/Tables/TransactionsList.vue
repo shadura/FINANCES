@@ -8,7 +8,7 @@ const numericSpaceId = Number(useRoute().params.space)
 
 const supabase = useSupabase()
 
-const { data: accountList } = useAsyncData('accounts', async () => {
+const { data: accountList, refresh: refreshAccounts } = useAsyncData('accounts', async () => {
 	const { data, error } = await supabase
 		.from('accounts')
 		.select('*')
@@ -25,7 +25,7 @@ const { data: tagsList } = useAsyncData('tags', async () => {
 	return data as Tag[]
 })
 
-const { data, refresh } = useAsyncData('transactions', async () => {
+const { data, refresh: refreshTransactions } = useAsyncData('transactions', async () => {
 	const { data, error } = await supabase
 		.from('transactions')
 		.select(
@@ -52,7 +52,7 @@ const deleteTransaction = async (id: number) => {
 	if (!confirm('Are you sure you want to delete this transaction?')) return
 
 	await supabase.from('transactions').delete().eq('id', id)
-	await refresh()
+	await updateData()
 }
 
 const getAccountName = (id: number | null) => {
@@ -68,6 +68,11 @@ const getAccountCurrency = (id: number | null) => {
 	const account = accountList.value?.find((account) => account.id === id)
 	return account?.currency || ''
 }
+
+const updateData = async () => {
+	await refreshTransactions()
+	await refreshAccounts()
+}
 </script>
 
 <template>
@@ -82,7 +87,7 @@ const getAccountCurrency = (id: number | null) => {
 					<Button>Add transaction</Button>
 				</PopoverTrigger>
 				<PopoverContent class="w-140">
-					<FormsTransaction :accountList :tagsList :numericSpaceId @sent="refresh" />
+					<FormsTransaction :accountList :tagsList :numericSpaceId @sent="updateData" />
 				</PopoverContent>
 			</Popover>
 
@@ -125,7 +130,8 @@ const getAccountCurrency = (id: number | null) => {
 								{{ transaction.amount_credit || 0 }} {{ getAccountCurrency(transaction.account_to) }}
 							</template>
 							<template v-if="transaction.type === ETransactionType.ADJUST">
-								{{ transaction.amount_credit || 0 }} {{ getAccountCurrency(transaction.account_to) }}
+								{{ (transaction.amount_credit || 0) >= 0 ? '+' : '-' }} {{ transaction.amount_credit || 0 }}
+								{{ getAccountCurrency(transaction.account_to) }}
 							</template>
 							<template v-if="transaction.type === ETransactionType.EXPENSE">
 								{{ transaction.amount_debit || 0 }} {{ getAccountCurrency(transaction.account_from) }}
@@ -136,9 +142,9 @@ const getAccountCurrency = (id: number | null) => {
 						</TableCell>
 						<TableCell>
 							<div class="flex gap-1">
-								<Badge v-for="tag in transaction.transaction_tags" :key="tag.tags.id" variant="secondary">
+								<Tag v-for="tag in transaction.transaction_tags" :key="tag.tags.id" :color="tag.tags.color">
 									{{ tag.tags.name }}
-								</Badge>
+								</Tag>
 							</div>
 						</TableCell>
 
@@ -155,7 +161,7 @@ const getAccountCurrency = (id: number | null) => {
 										</Button>
 									</PopoverTrigger>
 									<PopoverContent class="w-140">
-										<FormsTransaction :transaction :accountList :tagsList :numericSpaceId @sent="refresh" />
+										<FormsTransaction :transaction :accountList :tagsList :numericSpaceId @sent="updateData" />
 									</PopoverContent>
 								</Popover>
 

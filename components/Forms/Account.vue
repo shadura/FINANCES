@@ -16,6 +16,7 @@ const editItem = ref({
 	name: '',
 	currency: '',
 	type: '',
+	is_net_worth: true,
 })
 
 const isDisabled = computed(() => !editItem.value.name || !editItem.value.currency || !editItem.value.type)
@@ -26,6 +27,7 @@ const setAccountData = () => {
 			name: props.account.name,
 			currency: props.account.currency,
 			type: props.account.type,
+			is_net_worth: props.account.is_net_worth,
 		}
 	}
 }
@@ -46,6 +48,7 @@ const createAccount = async () => {
 		name: '',
 		currency: '',
 		type: '',
+		is_net_worth: true,
 	}
 }
 
@@ -108,6 +111,12 @@ const handleSubmitForm = async () => {
 						</SelectContent>
 					</Select>
 				</div>
+
+				<div class="mb-4">
+					<Checkbox v-model="editItem.is_net_worth" />
+					<label for="is_net_worth" class="ml-2">Calc for Net Worth</label>
+				</div>
+
 				<Button type="submit" class="col-span-2 h-8 w-full" :disabled="isDisabled">Save</Button>
 			</div>
 		</div>

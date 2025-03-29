@@ -13,7 +13,7 @@ import {
 const space = computed(() => Number(useRoute().params.space))
 
 // Menu items.
-const items = [
+const items = computed(() => [
 	{
 		title: 'Dashboard',
 		url: `/${space.value}`,
@@ -46,7 +46,7 @@ const items = [
 		url: `/${space.value}/settings`,
 		icon: Settings,
 	},
-]
+])
 
 const user = useSupabaseUser()
 const client = useSupabaseClient()
