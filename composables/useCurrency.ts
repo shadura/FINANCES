@@ -1,6 +1,8 @@
 import type { ECurrency } from '@/types/enums/currency'
 
 const useCurrency = () => {
+	const supabase = useSupabase()
+
 	const currentCurrencyRates = useState('current-currency-rates', () => {
 		return {
 			USD: 1,
@@ -9,7 +11,16 @@ const useCurrency = () => {
 		}
 	})
 
-	// adsfsdf
+	const getCurrencyRates = async () => {
+		try {
+			const { data, error } = await supabase.from('currency_rates').select().single()
+			if (error) throw error
+
+			currentCurrencyRates.value = data
+		} catch (err) {
+			console.error('error:', err)
+		}
+	}
 
 	const convert = (amount: number, from: ECurrency, to: ECurrency) => {
 		if (from === to) return amount
@@ -19,6 +30,7 @@ const useCurrency = () => {
 	}
 
 	return {
+		getCurrencyRates,
 		currentCurrencyRates,
 		convert,
 	}

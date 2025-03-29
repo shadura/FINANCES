@@ -1,3 +1,8 @@
+<script setup lang="ts">
+const { getCurrencyRates } = useCurrency()
+await getCurrencyRates()
+</script>
+
 <template>
 	<SidebarProvider>
 		<AppSidebar />

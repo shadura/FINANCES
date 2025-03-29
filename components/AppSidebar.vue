@@ -37,9 +37,14 @@ const items = computed(() => [
 	},
 	{
 		title: 'Reports',
-		url: `/${space.value}/reports`,
+		url: ``,
 		icon: ChartCandlestick,
-		soon: true,
+		subItems: [
+			{
+				title: 'Transactions',
+				url: `/${space.value}/reports/transactions`,
+			},
+		],
 	},
 	{
 		title: 'Space Settings',
@@ -71,11 +76,29 @@ const signOut = async () => {
 					<SidebarMenu>
 						<SidebarMenuItem v-for="item in items" :key="item.title">
 							<SidebarMenuButton asChild>
-								<nuxt-link :to="item.url">
+								<nuxt-link v-if="item.url" :to="item.url">
 									<component :is="item.icon" />
 									<span>{{ item.title }}</span>
 									<span v-if="item.soon" class="text-xs text-gray-500 bg-gray-200 rounded-lg px-1 py-0.5">soon</span>
 								</nuxt-link>
+
+								<span v-else>
+									<component :is="item.icon" />
+									<span>{{ item.title }}</span>
+									<span v-if="item.soon" class="text-xs text-gray-500 bg-gray-200 rounded-lg px-1 py-0.5">soon</span>
+								</span>
+
+								<Collapsible v-if="item.subItems" defaultOpen>
+									<SidebarMenuSub>
+										<SidebarMenuSubItem v-for="subItem in item.subItems" :key="subItem.title">
+											<SidebarMenuSubButton asChild>
+												<nuxt-link :to="subItem.url">
+													<span>{{ subItem.title }}</span>
+												</nuxt-link>
+											</SidebarMenuSubButton>
+										</SidebarMenuSubItem>
+									</SidebarMenuSub>
+								</Collapsible>
 							</SidebarMenuButton>
 						</SidebarMenuItem>
 					</SidebarMenu>
