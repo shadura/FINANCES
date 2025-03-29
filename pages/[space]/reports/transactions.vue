@@ -56,7 +56,15 @@ const handleSelectTag = (ev: any) => {
 	getResult()
 }
 
-const handleRemoveTag = (tag: Tag) => {
+const handleRemoveTag = () => {
+	setTimeout(() => {
+		getResult()
+	}, 100)
+}
+
+const handleTagClick = (tag: Tag) => {
+	selectedTags.value.push(tag)
+	open.value = false
 	getResult()
 }
 
@@ -160,7 +168,14 @@ watch(
 						<div>
 							<span class="inline-block mr-2 w-16">{{ dayjs(item.date).format('DD MMM') }}</span>
 
-							<Tag v-for="tag in item.transaction_tags" :key="tag.id" :color="tag.tags.color">{{ tag.tags.name }}</Tag>
+							<Tag
+								v-for="tag in item.transaction_tags"
+								:key="tag.id"
+								:color="tag.tags.color"
+								class="cursor-pointer"
+								@click="handleTagClick(tag.tags)"
+								>{{ tag.tags.name }}</Tag
+							>
 
 							<span class="inline-block ml-2">{{ item.description }}</span>
 						</div>
