@@ -345,7 +345,11 @@ const handleSubmitForm = async () => {
 				<div v-if="isShowTo" class="mb-2">
 					<Separator class="my-4" :label="editItem.type === ETransactionType.ADJUST ? 'Adjust balance' : 'Received'" />
 
-					<Select v-model="editItem.account_to" @update:model-value="handleUpdateAccountTo">
+					<Select
+						v-model="editItem.account_to"
+						:disabled="!!props.transaction?.id"
+						@update:model-value="handleUpdateAccountTo"
+					>
 						<SelectTrigger class="col-span-2">
 							<SelectValue placeholder="Account" />
 						</SelectTrigger>
