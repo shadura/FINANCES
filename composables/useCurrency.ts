@@ -4,8 +4,8 @@ const useCurrency = () => {
 	const currentCurrencyRates = useState('current-currency-rates', () => {
 		return {
 			USD: 1,
-			EUR: 1.08,
-			UAH: 0.024,
+			EUR: 1.0815,
+			UAH: 0.024137,
 		}
 	})
 
@@ -13,7 +13,7 @@ const useCurrency = () => {
 		if (from === to) return amount
 		if (!currentCurrencyRates.value[from] || !currentCurrencyRates.value[to]) return amount
 
-		return Math.round((amount * currentCurrencyRates.value[from]) / currentCurrencyRates.value[to])
+		return (amount * currentCurrencyRates.value[from]) / currentCurrencyRates.value[to]
 	}
 
 	return {

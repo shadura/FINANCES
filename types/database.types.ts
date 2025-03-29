@@ -53,6 +53,30 @@ export type Database = {
           },
         ]
       }
+      currency_rates: {
+        Row: {
+          date: string
+          EUR: number
+          id: number
+          UAH: number
+          USD: number
+        }
+        Insert: {
+          date?: string
+          EUR: number
+          id?: number
+          UAH: number
+          USD?: number
+        }
+        Update: {
+          date?: string
+          EUR?: number
+          id?: number
+          UAH?: number
+          USD?: number
+        }
+        Relationships: []
+      }
       plan_tags: {
         Row: {
           id: number
