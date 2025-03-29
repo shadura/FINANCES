@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { Edit, Trash, ChevronUp, ChevronDown, MoveHorizontal, Scale } from 'lucide-vue-next'
-import type { Account, Tag, TransactionWithTags } from '~/types/index.types'
 import { ETransactionType } from '~/types/enums/transaction'
 import dayjs from 'dayjs'
 
@@ -8,44 +7,18 @@ const numericSpaceId = Number(useRoute().params.space)
 
 const supabase = useSupabase()
 
-const { data: accountList, refresh: refreshAccounts } = useAsyncData('accounts', async () => {
-	const { data, error } = await supabase
-		.from('accounts')
-		.select('*')
-		.eq('space_id', numericSpaceId)
-		.eq('deleted', false)
-		.order('created_at', { ascending: false })
-	if (error) throw error
-	return data as Account[]
-})
+const { list, isListLoading, updateData: updateTransactionsData } = useTransactions()
+const { list: accountList, getAccountName, getAccountCurrency, updateData: updatedAccountsData } = useAccounts()
+const { list: tagsList, updateData: updateTagsData } = useTags()
 
-const { data: tagsList } = useAsyncData('tags', async () => {
-	const { data, error } = await supabase.from('tags').select('*').eq('space_id', numericSpaceId)
-	if (error) throw error
-	return data as Tag[]
-})
+const updateData = async () => {
+	await updateTransactionsData()
+	await updatedAccountsData()
+	await updateTagsData()
+}
 
-const { data, refresh: refreshTransactions } = useAsyncData('transactions', async () => {
-	const { data, error } = await supabase
-		.from('transactions')
-		.select(
-			`
-			*,
-			transaction_tags (
-				id,
-				tags (
-					id,
-					name,
-					color
-				)
-			)
-		`,
-		)
-		.eq('space_id', numericSpaceId)
-		.order('created_at', { ascending: false })
-
-	if (error) throw error
-	return data as unknown as TransactionWithTags[]
+onMounted(() => {
+	updateData()
 })
 
 const deleteTransaction = async (id: number) => {
@@ -53,25 +26,6 @@ const deleteTransaction = async (id: number) => {
 
 	await supabase.from('transactions').delete().eq('id', id)
 	await updateData()
-}
-
-const getAccountName = (id: number | null) => {
-	if (!id) return ''
-
-	const account = accountList.value?.find((account) => account.id === id)
-	return account?.name || ''
-}
-
-const getAccountCurrency = (id: number | null) => {
-	if (!id) return ''
-
-	const account = accountList.value?.find((account) => account.id === id)
-	return account?.currency || ''
-}
-
-const updateData = async () => {
-	await refreshTransactions()
-	await refreshAccounts()
 }
 </script>
 
@@ -91,7 +45,11 @@ const updateData = async () => {
 				</PopoverContent>
 			</Popover>
 
-			<Table class="mt-4">
+			<div v-if="isListLoading">
+				<Loader />
+			</div>
+
+			<Table v-else class="mt-4">
 				<TableHeader>
 					<TableRow>
 						<TableHead class="w-[50px]">Type</TableHead>
@@ -103,7 +61,7 @@ const updateData = async () => {
 					</TableRow>
 				</TableHeader>
 				<TableBody>
-					<TableRow v-for="transaction in data" :key="transaction.id">
+					<TableRow v-for="transaction in list" :key="transaction.id">
 						<TableCell>
 							<MoveHorizontal v-if="transaction.type === ETransactionType.TRANSFER" :size="16" />
 							<Scale v-if="transaction.type === ETransactionType.ADJUST" :size="16" />

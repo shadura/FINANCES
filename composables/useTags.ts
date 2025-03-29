@@ -18,10 +18,15 @@ const useTags = () => {
 		}
 	}
 
+	const updateData = async () => {
+		await getTags()
+	}
+
 	return {
 		getTags,
 		isListLoading,
 		list,
+		updateData,
 	}
 }
 

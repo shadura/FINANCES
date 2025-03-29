@@ -41,7 +41,11 @@ onMounted(() => {
 				</PopoverContent>
 			</Popover>
 
-			<Table v-if="!isListLoading" class="mt-4">
+			<div v-if="isListLoading">
+				<Loader />
+			</div>
+
+			<Table v-else class="mt-4">
 				<TableHeader>
 					<TableRow>
 						<TableHead>Tags</TableHead>

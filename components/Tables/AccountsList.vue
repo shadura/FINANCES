@@ -1,28 +1,18 @@
 <script setup lang="ts">
 import { Edit, Trash } from 'lucide-vue-next'
-import type { Account } from '~/types/index.types'
 
 const numericSpaceId = Number(useRoute().params.space)
 
 const supabase = useSupabase()
 
-const { data, refresh } = useAsyncData('accounts', async () => {
-	const { data, error } = await supabase
-		.from('accounts')
-		.select('*')
-		.eq('space_id', numericSpaceId)
-		.eq('deleted', false)
-		.order('created_at', { ascending: false })
-	if (error) throw error
-	return data as Account[]
-})
+const { isListLoading, list: accountsList, updateData } = useAccounts()
 
 const deleteAccount = async (id: number) => {
 	if (!confirm('Are you sure you want to delete this account?')) return
 
 	await supabase.from('accounts').update({ deleted: true }).eq('id', id)
 
-	await refresh()
+	await updateData()
 }
 </script>
 
@@ -38,11 +28,15 @@ const deleteAccount = async (id: number) => {
 					<Button>Add account</Button>
 				</PopoverTrigger>
 				<PopoverContent class="w-80">
-					<FormsAccount :numericSpaceId @sent="refresh" />
+					<FormsAccount :numericSpaceId @sent="updateData" />
 				</PopoverContent>
 			</Popover>
 
-			<Table class="mt-4">
+			<div v-if="isListLoading">
+				<Loader />
+			</div>
+
+			<Table v-else class="mt-4">
 				<TableHeader>
 					<TableRow>
 						<TableHead> Name </TableHead>
@@ -52,7 +46,7 @@ const deleteAccount = async (id: number) => {
 					</TableRow>
 				</TableHeader>
 				<TableBody>
-					<TableRow v-for="account in data" :key="account.id">
+					<TableRow v-for="account in accountsList" :key="account.id">
 						<TableCell class="font-medium">
 							{{ account.name }}
 						</TableCell>
@@ -67,7 +61,7 @@ const deleteAccount = async (id: number) => {
 										</Button>
 									</PopoverTrigger>
 									<PopoverContent class="w-80">
-										<FormsAccount :numericSpaceId :account @sent="refresh" />
+										<FormsAccount :numericSpaceId :account @sent="updateData" />
 									</PopoverContent>
 								</Popover>
 

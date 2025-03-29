@@ -30,6 +30,10 @@ const useAccounts = () => {
 		}
 	}
 
+	const updateData = async () => {
+		await getList()
+	}
+
 	const getNetWorhInfo = computed(() => {
 		if (!list.value.length)
 			return {
@@ -79,11 +83,28 @@ const useAccounts = () => {
 		}
 	})
 
+	const getAccountName = (id: number | null) => {
+		if (!id) return ''
+
+		const account = list.value?.find((account) => account.id === id)
+		return account?.name || ''
+	}
+
+	const getAccountCurrency = (id: number | null) => {
+		if (!id) return ''
+
+		const account = list.value?.find((account) => account.id === id)
+		return account?.currency || ''
+	}
+
 	return {
 		getList,
 		list,
+		updateData,
 		isListLoading,
 		getNetWorhInfo,
+		getAccountName,
+		getAccountCurrency,
 	}
 }
 

@@ -5,22 +5,13 @@ const numericSpaceId = Number(useRoute().params.space)
 
 const supabase = useSupabase()
 
-const { data, refresh } = useAsyncData('tags', async () => {
-	const { data, error } = await supabase
-		.from('tags')
-		.select('*')
-		.eq('space_id', numericSpaceId)
-		.eq('deleted', false)
-		.order('created_at', { ascending: false })
-	if (error) throw error
-	return data
-})
+const { isListLoading, list: tagsList, updateData } = useTags()
 
 const deleteTag = async (id: number) => {
 	if (!confirm('Are you sure you want to delete this tag?')) return
 
 	await supabase.from('tags').update({ deleted: true }).eq('id', id)
-	await refresh()
+	await updateData()
 }
 </script>
 
@@ -36,11 +27,15 @@ const deleteTag = async (id: number) => {
 					<Button>Add tag</Button>
 				</PopoverTrigger>
 				<PopoverContent class="w-80">
-					<FormsTag :numericSpaceId @sent="refresh" />
+					<FormsTag :numericSpaceId @sent="updateData" />
 				</PopoverContent>
 			</Popover>
 
-			<Table class="mt-4">
+			<div v-if="isListLoading">
+				<Loader />
+			</div>
+
+			<Table v-else class="mt-4">
 				<TableHeader>
 					<TableRow>
 						<TableHead> Name </TableHead>
@@ -48,7 +43,7 @@ const deleteTag = async (id: number) => {
 					</TableRow>
 				</TableHeader>
 				<TableBody>
-					<TableRow v-for="tag in data" :key="tag.id">
+					<TableRow v-for="tag in tagsList" :key="tag.id">
 						<TableCell class="font-medium">
 							<Tag :color="tag.color">
 								{{ tag.name }}
@@ -63,7 +58,7 @@ const deleteTag = async (id: number) => {
 										</Button>
 									</PopoverTrigger>
 									<PopoverContent class="w-80">
-										<FormsTag :numericSpaceId :tag="tag" @sent="refresh" />
+										<FormsTag :numericSpaceId :tag="tag" @sent="updateData" />
 									</PopoverContent>
 								</Popover>
 

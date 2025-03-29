@@ -1,10 +1,10 @@
 <script setup lang="ts">
 const props = defineProps<{
-	color: string
+	color?: string
 }>()
 
 const textColor = computed(() => {
-	if (props.color === 'default') return '#000000'
+	if (!props.color || props.color === 'default') return '#000000'
 
 	// Calculate whether to use black or white text based on background color brightness
 	const hexColor = props.color && props.color !== 'default' ? props.color : '#ffffff'
@@ -22,7 +22,7 @@ const textColor = computed(() => {
 	<Badge
 		variant="secondary"
 		class="py-1"
-		:style="{ backgroundColor: props.color !== 'default' ? props.color : '', color: textColor }"
+		:style="{ backgroundColor: props.color && props.color !== 'default' ? props.color : '', color: textColor }"
 	>
 		<slot />
 	</Badge>
