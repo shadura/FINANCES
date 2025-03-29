@@ -4,7 +4,7 @@ const useCurrency = () => {
 	const currentCurrencyRates = useState('current-currency-rates', () => {
 		return {
 			USD: 1,
-			EUR: 0.97,
+			EUR: 0.92,
 			UAH: 0.024,
 		}
 	})
