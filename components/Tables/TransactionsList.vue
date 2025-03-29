@@ -88,7 +88,7 @@ const deleteTransaction = async (id: number) => {
 								{{ transaction.amount_credit || 0 }} {{ getAccountCurrency(transaction.account_to) }}
 							</template>
 							<template v-if="transaction.type === ETransactionType.ADJUST">
-								{{ (transaction.amount_credit || 0) >= 0 ? '+' : '-' }} {{ transaction.amount_credit || 0 }}
+								{{ (transaction.amount_credit || 0) >= 0 ? '+' : '' }} {{ transaction.amount_credit || 0 }}
 								{{ getAccountCurrency(transaction.account_to) }}
 							</template>
 							<template v-if="transaction.type === ETransactionType.EXPENSE">
