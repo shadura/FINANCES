@@ -113,7 +113,7 @@ const handleSubmitForm = async () => {
 				</div>
 
 				<div class="mb-4">
-					<Checkbox v-model="editItem.is_net_worth" />
+					<Checkbox name="is_net_worth" v-model="editItem.is_net_worth" />
 					<label for="is_net_worth" class="ml-2">Calc for Net Worth</label>
 				</div>
 
