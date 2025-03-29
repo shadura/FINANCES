@@ -63,6 +63,9 @@ const handleRemoveTag = () => {
 }
 
 const handleTagClick = (tag: Tag) => {
+	const isTagSelected = selectedTags.value.some((t) => t.id === tag.id)
+	if (isTagSelected) return
+
 	selectedTags.value.push(tag)
 	open.value = false
 	getResult()

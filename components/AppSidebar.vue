@@ -88,7 +88,7 @@ const signOut = async () => {
 									<span v-if="item.soon" class="text-xs text-gray-500 bg-gray-200 rounded-lg px-1 py-0.5">soon</span>
 								</span>
 
-								<Collapsible v-if="item.subItems" defaultOpen>
+								<template v-if="item.subItems">
 									<SidebarMenuSub>
 										<SidebarMenuSubItem v-for="subItem in item.subItems" :key="subItem.title">
 											<SidebarMenuSubButton asChild>
@@ -98,7 +98,7 @@ const signOut = async () => {
 											</SidebarMenuSubButton>
 										</SidebarMenuSubItem>
 									</SidebarMenuSub>
-								</Collapsible>
+								</template>
 							</SidebarMenuButton>
 						</SidebarMenuItem>
 					</SidebarMenu>
