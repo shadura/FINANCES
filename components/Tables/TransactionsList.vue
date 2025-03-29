@@ -8,7 +8,7 @@ const numericSpaceId = Number(useRoute().params.space)
 const supabase = useSupabase()
 
 const { list, isListLoading, updateData: updateTransactionsData } = useTransactions()
-const { list: accountList, getAccountName, getAccountCurrency, updateData: updatedAccountsData } = useAccounts()
+const { list: accountList, updateData: updatedAccountsData } = useAccounts()
 const { list: tagsList, updateData: updateTagsData } = useTags()
 
 const updateData = async () => {
@@ -70,32 +70,32 @@ const deleteTransaction = async (id: number) => {
 						</TableCell>
 						<TableCell class="font-medium">
 							<template v-if="transaction.type === ETransactionType.TRANSFER">
-								{{ getAccountName(transaction.account_from) }} → {{ getAccountName(transaction.account_to) }}
+								{{ transaction.account_from_info?.name }} → {{ transaction.account_to_info?.name }}
 							</template>
 							<template v-if="transaction.type === ETransactionType.ADJUST">
-								{{ getAccountName(transaction.account_to) }}
+								{{ transaction.account_to_info?.name }}
 							</template>
 							<template v-if="transaction.type === ETransactionType.EXPENSE">
-								{{ getAccountName(transaction.account_from) }}
+								{{ transaction.account_from_info?.name }}
 							</template>
 							<template v-if="transaction.type === ETransactionType.INCOME">
-								{{ getAccountName(transaction.account_to) }}
+								{{ transaction.account_to_info?.name }}
 							</template>
 						</TableCell>
 						<TableCell class="font-medium">
 							<template v-if="transaction.type === ETransactionType.TRANSFER">
-								{{ transaction.amount_debit || 0 }} {{ getAccountCurrency(transaction.account_from) }} →
-								{{ transaction.amount_credit || 0 }} {{ getAccountCurrency(transaction.account_to) }}
+								{{ transaction.amount_debit || 0 }} {{ transaction.account_from_info?.currency }} →
+								{{ transaction.amount_credit || 0 }} {{ transaction.account_to_info?.currency }}
 							</template>
 							<template v-if="transaction.type === ETransactionType.ADJUST">
 								{{ (transaction.amount_credit || 0) >= 0 ? '+' : '' }} {{ transaction.amount_credit || 0 }}
-								{{ getAccountCurrency(transaction.account_to) }}
+								{{ transaction.account_to_info?.currency }}
 							</template>
 							<template v-if="transaction.type === ETransactionType.EXPENSE">
-								{{ transaction.amount_debit || 0 }} {{ getAccountCurrency(transaction.account_from) }}
+								{{ transaction.amount_debit || 0 }} {{ transaction.account_from_info?.currency }}
 							</template>
 							<template v-if="transaction.type === ETransactionType.INCOME">
-								{{ transaction.amount_credit || 0 }} {{ getAccountCurrency(transaction.account_to) }}
+								{{ transaction.amount_credit || 0 }} {{ transaction.account_to_info?.currency }}
 							</template>
 						</TableCell>
 						<TableCell>

@@ -9,5 +9,9 @@ export type TransactionTags = DB<'transaction_tags'>
 export type Plan = DB<'plans'>
 export type PlanTags = DB<'plan_tags'>
 
-export type TransactionWithTags = Transaction & { transaction_tags: { tag_id: number; tags: Tag }[] }
+export type TransactionWithTags = Transaction & {
+	transaction_tags: { tag_id: number; tags: Tag }[]
+	account_from_info?: Account
+	account_to_info?: Account
+}
 export type PlanWithTags = Plan & { plan_tags: { tag_id: number; tags: Tag }[] }

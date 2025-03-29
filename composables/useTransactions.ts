@@ -22,7 +22,21 @@ const useTransactions = () => {
 					name,
 					color
 				)
-			)
+			),
+      account_from_info: account_from (
+      id,
+      name,
+      balance,
+      type,
+      currency
+    ),
+      account_to_info: account_to (
+      id,
+      name,
+      balance,
+      type,
+      currency
+    )
 		`,
 				)
 				.eq('space_id', numericSpaceId.value)
