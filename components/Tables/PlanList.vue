@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { Edit, Trash } from 'lucide-vue-next'
-import { PRIMARY_CURRENCY } from '@/const/currency.const'
 
 interface IPlanListProps {
 	period: number
@@ -10,7 +9,7 @@ const props = defineProps<IPlanListProps>()
 
 const numericSpaceId = Number(useRoute().params.space)
 
-const { getPlans, isListLoading, list, updateData, deletePlan, getPlannedTags } = usePlans()
+const { getPlans, isListLoading, list, updateData, deletePlan } = usePlans()
 const { list: tagsList, getTags } = useTags()
 
 watch(
@@ -27,21 +26,6 @@ onMounted(() => {
 </script>
 
 <template>
-	<div class="flex items-center justify-start gap-8 mb-4">
-		<div>
-			<div class="font-bold mb-1">Planned Income</div>
-			<div>{{ useFormatAmount(getPlannedTags.income.amount, PRIMARY_CURRENCY) }}</div>
-		</div>
-		<div>
-			<div class="font-bold mb-1">Planned Expense</div>
-			<div>{{ useFormatAmount(getPlannedTags.expense.amount, PRIMARY_CURRENCY) }}</div>
-		</div>
-		<div>
-			<div class="font-bold mb-1">Left to plan</div>
-			<div>{{ useFormatAmount(getPlannedTags.income.amount - getPlannedTags.expense.amount, PRIMARY_CURRENCY) }}</div>
-		</div>
-	</div>
-
 	<Card>
 		<CardHeader>
 			<CardTitle>Plan list</CardTitle>
