@@ -4,6 +4,7 @@ const props = defineProps<{
 }>()
 
 const textColor = computed(() => {
+	return '#000'
 	if (!props.color || props.color === 'default') return '#000000'
 
 	// Calculate whether to use black or white text based on background color brightness
@@ -14,7 +15,7 @@ const textColor = computed(() => {
 	// Calculate perceived brightness using the formula: (R * 0.299 + G * 0.587 + B * 0.114)
 	const brightness = r * 0.299 + g * 0.587 + b * 0.114
 	console.log('brightness', brightness)
-	return brightness > 170 ? '#000000' : '#ffffff'
+	return brightness > 140 ? '#000000' : '#ffffff'
 })
 </script>
 
