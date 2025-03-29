@@ -18,8 +18,8 @@ const { convert } = useCurrency()
 const now = dayjs()
 
 const form = ref({
-	fromDate: '2025-03-01',
-	toDate: '2025-03-31',
+	fromDate: now.startOf('month').format('YYYY-MM-DD'),
+	toDate: now.endOf('month').format('YYYY-MM-DD'),
 })
 
 const result = ref<{ sum: number; list: TransactionReportItem[] }>({ sum: 0, list: [] })
