@@ -28,14 +28,16 @@ const useTransactions = () => {
       name,
       balance,
       type,
-      currency
+      currency,
+      deleted
     ),
       account_to_info: account_to (
       id,
       name,
       balance,
       type,
-      currency
+      currency,
+      deleted
     )
 		`,
 				)

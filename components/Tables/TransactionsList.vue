@@ -70,16 +70,19 @@ const deleteTransaction = async (id: number) => {
 						</TableCell>
 						<TableCell class="font-medium">
 							<template v-if="transaction.type === ETransactionType.TRANSFER">
-								{{ transaction.account_from_info?.name }} → {{ transaction.account_to_info?.name }}
+								{{ transaction.account_from_info?.name
+								}}{{ transaction.account_from_info?.deleted ? ' (deleted)' : '' }} →
+								{{ transaction.account_to_info?.name }}{{ transaction.account_to_info?.deleted ? ' (deleted)' : '' }}
 							</template>
 							<template v-if="transaction.type === ETransactionType.ADJUST">
-								{{ transaction.account_to_info?.name }}
+								{{ transaction.account_to_info?.name }}{{ transaction.account_to_info?.deleted ? ' (deleted)' : '' }}
 							</template>
 							<template v-if="transaction.type === ETransactionType.EXPENSE">
-								{{ transaction.account_from_info?.name }}
+								{{ transaction.account_from_info?.name
+								}}{{ transaction.account_from_info?.deleted ? ' (deleted)' : '' }}
 							</template>
 							<template v-if="transaction.type === ETransactionType.INCOME">
-								{{ transaction.account_to_info?.name }}
+								{{ transaction.account_to_info?.name }}{{ transaction.account_to_info?.deleted ? ' (deleted)' : '' }}
 							</template>
 						</TableCell>
 						<TableCell class="font-medium">
