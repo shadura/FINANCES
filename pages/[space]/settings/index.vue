@@ -1,4 +1,9 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+const { getSpace } = useSpace()
+
+const spaceId = useRoute().params.space as string
+const space = await getSpace(Number(spaceId))
+</script>
 
 <template>
 	<div>
@@ -9,7 +14,18 @@
 				<TablesAccountsList />
 			</div>
 			<div>
-				<TablesTagsList />
+				<Card>
+					<CardHeader>
+						<CardTitle>Space members</CardTitle>
+					</CardHeader>
+					<CardContent>
+						<ul>
+							<li v-for="member in space.members" :key="member.user_id">{{ member.name }}</li>
+						</ul>
+					</CardContent>
+				</Card>
+
+				<TablesTagsList class="mt-4" />
 			</div>
 		</div>
 	</div>

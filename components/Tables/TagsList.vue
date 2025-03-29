@@ -13,6 +13,10 @@ const deleteTag = async (id: number) => {
 	await supabase.from('tags').update({ deleted: true }).eq('id', id)
 	await updateData()
 }
+
+onMounted(() => {
+	updateData()
+})
 </script>
 
 <template>

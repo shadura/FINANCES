@@ -14,6 +14,10 @@ const deleteAccount = async (id: number) => {
 
 	await updateData()
 }
+
+onMounted(() => {
+	updateData()
+})
 </script>
 
 <template>
