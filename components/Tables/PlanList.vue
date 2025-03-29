@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Edit, Trash } from 'lucide-vue-next'
+import { PRIMARY_CURRENCY } from '@/const/currency.const'
 
 interface IPlanListProps {
 	period: number
@@ -9,7 +10,7 @@ const props = defineProps<IPlanListProps>()
 
 const numericSpaceId = Number(useRoute().params.space)
 
-const { getPlans, isListLoading, list, updateData, deletePlan } = usePlans()
+const { getPlans, isListLoading, list, updateData, deletePlan, getPlannedTags } = usePlans()
 const { list: tagsList, getTags } = useTags()
 
 watch(
@@ -26,6 +27,21 @@ onMounted(() => {
 </script>
 
 <template>
+	<div class="flex items-center justify-start gap-8 mb-4">
+		<div>
+			<div class="font-bold mb-1">Planned Income</div>
+			<div>{{ useFormatAmount(getPlannedTags.income.amount, PRIMARY_CURRENCY) }}</div>
+		</div>
+		<div>
+			<div class="font-bold mb-1">Planned Expense</div>
+			<div>{{ useFormatAmount(getPlannedTags.expense.amount, PRIMARY_CURRENCY) }}</div>
+		</div>
+		<div>
+			<div class="font-bold mb-1">Left to plan</div>
+			<div>{{ useFormatAmount(getPlannedTags.income.amount - getPlannedTags.expense.amount, PRIMARY_CURRENCY) }}</div>
+		</div>
+	</div>
+
 	<Card>
 		<CardHeader>
 			<CardTitle>Plan list</CardTitle>
@@ -58,6 +74,7 @@ onMounted(() => {
 					<TableRow v-for="plan in list" :key="plan.id">
 						<TableCell class="font-medium">
 							<div class="flex gap-1">
+								<Tag v-if="plan.is_income" color="#13dd13"> Income </Tag>
 								<Tag v-for="tag in plan.plan_tags" :key="tag.tags.id" :color="tag.tags.color">
 									{{ tag.tags.name }}
 								</Tag>

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Edit, Trash } from 'lucide-vue-next'
+import { PRIMARY_CURRENCY } from '~/const/currency.const'
 
 const numericSpaceId = Number(useRoute().params.space)
 

@@ -17,7 +17,11 @@ const { convert } = useCurrency()
 			</div>
 
 			<ul v-else class="mt-4">
-				<li v-for="tag in getPlannedTags" :key="tag.tag.id" class="flex gap-1 justify-between mb-2 pb-2 border-b">
+				<li
+					v-for="tag in getPlannedTags.expense.list"
+					:key="tag.tag.id"
+					class="flex gap-1 justify-between mb-2 pb-2 border-b"
+				>
 					<div>
 						<Tag :color="tag.tag.color">
 							{{ tag.tag.name }}

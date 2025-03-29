@@ -58,17 +58,35 @@ const usePlan = () => {
 	}
 
 	const getPlannedTags = computed(() => {
-		if (!list.value.length) return []
+		if (!list.value.length)
+			return {
+				income: {
+					amount: 0,
+					list: [],
+				},
+				expense: {
+					amount: 0,
+					list: [],
+				},
+			}
+
+		const expenceList = list.value.filter((plan) => !plan.is_income)
+		const incomeList = list.value.filter((plan) => plan.is_income)
 
 		const { convert } = useCurrency()
 
-		const sum = list.value.reduce(
+		const expenceAmount = expenceList.reduce(
+			(acc, plan) => acc + convert(plan.amount, plan.currency as ECurrency, PRIMARY_CURRENCY),
+			0,
+		)
+
+		const incomeAmount = incomeList.reduce(
 			(acc, plan) => acc + convert(plan.amount, plan.currency as ECurrency, PRIMARY_CURRENCY),
 			0,
 		)
 
 		const result: { tag: Tag; amount: number; currency: ECurrency; persent: number }[] = []
-		list.value.forEach((plan) => {
+		expenceList.forEach((plan) => {
 			if (!plan.plan_tags.length) return
 
 			plan.plan_tags.forEach((planTag) => {
@@ -90,12 +108,21 @@ const usePlan = () => {
 			})
 		})
 
-		return result
-			.sort((a, b) => b.amount - a.amount)
-			.map((tag) => ({
-				...tag,
-				persent: Math.round((tag.amount / sum) * 100 * 100) / 100,
-			}))
+		return {
+			income: {
+				amount: incomeAmount,
+				list: [],
+			},
+			expense: {
+				amount: expenceAmount,
+				list: result
+					.sort((a, b) => b.amount - a.amount)
+					.map((tag) => ({
+						...tag,
+						persent: Math.round((tag.amount / expenceAmount) * 100 * 100) / 100,
+					})),
+			},
+		}
 	})
 
 	return {

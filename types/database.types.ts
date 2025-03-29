@@ -103,6 +103,7 @@ export type Database = {
           currency: string | null
           description: string | null
           id: number
+          is_income: boolean | null
           period_month_year: number
           space_id: number
         }
@@ -112,6 +113,7 @@ export type Database = {
           currency?: string | null
           description?: string | null
           id?: number
+          is_income?: boolean | null
           period_month_year: number
           space_id: number
         }
@@ -121,6 +123,7 @@ export type Database = {
           currency?: string | null
           description?: string | null
           id?: number
+          is_income?: boolean | null
           period_month_year?: number
           space_id?: number
         }

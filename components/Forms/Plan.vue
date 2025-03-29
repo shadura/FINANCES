@@ -8,7 +8,7 @@ const props = defineProps<{
 	numericSpaceId: number
 	period: number
 	tagsList: null | Tag[]
-	plan?: Plan
+	plan?: PlanWithTags
 }>()
 
 const emit = defineEmits(['sent'])
@@ -17,6 +17,7 @@ const clearPlan = {
 	description: '',
 	amount: 0,
 	currency: '',
+	is_income: false,
 }
 
 const editItem = ref({ ...clearPlan })
@@ -31,6 +32,7 @@ const setTagData = () => {
 			description: props.plan.description || '',
 			amount: props.plan.amount,
 			currency: props.plan.currency || '',
+			is_income: props.plan.is_income || false,
 		}
 
 		if (props.plan?.plan_tags?.length) {
@@ -272,6 +274,12 @@ const handleSubmitForm = async () => {
 						</SelectContent>
 					</Select>
 				</div>
+
+				<div class="mb-4">
+					<Checkbox v-model="editItem.is_income" />
+					<label for="is_income" class="ml-2">Income</label>
+				</div>
+
 				<Button type="submit" class="col-span-2 h-8 w-full" :disabled="isDisabled || isLoading">
 					<Loader2 v-if="isLoading" class="w-4 h-4 mr-2 animate-spin" />
 					Save
