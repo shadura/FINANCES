@@ -30,7 +30,7 @@ const props = defineProps<{
 }>()
 
 const series = computed(() => {
-	return props.data.list.map((item) => item.amount)
+	return props.data.list.map((item) => item.converted.amount)
 })
 
 const labels = computed(() => {
