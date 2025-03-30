@@ -128,6 +128,12 @@ const createTagsRelationship = async (plan_id: number, tags: ITag[]) => {
 	await supabase.from('plan_tags').insert(planTags)
 }
 
+const handleUpdateAccount = () => {
+	if (editItem.value.preferred_account && !editItem.value.currency) {
+		editItem.value.currency = props.accountList?.find((a) => a.id === editItem.value.preferred_account)?.currency || ''
+	}
+}
+
 // * Submit
 const isLoading = ref(false)
 const createPlan = async () => {
@@ -253,7 +259,7 @@ const handleSubmitForm = async () => {
 				</div>
 
 				<div class="mb-2">
-					<Select v-model="editItem.preferred_account">
+					<Select v-model="editItem.preferred_account" @update:model-value="handleUpdateAccount">
 						<SelectTrigger class="col-span-2">
 							<SelectValue placeholder="Preferred Account" />
 						</SelectTrigger>
