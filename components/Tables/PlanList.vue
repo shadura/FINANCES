@@ -25,6 +25,13 @@ onMounted(() => {
 	getTags()
 	updatedAccountsData()
 })
+
+const getFormatedDescription = (text?: string | null) => {
+	if (!text) return ''
+
+	const urlPattern = /(\bhttps?:\/\/[^\s]+)/g
+	return text.replace(urlPattern, (url) => `<a href="${url}" target="_blank" class="underline">link</a>`)
+}
 </script>
 
 <template>
@@ -50,7 +57,7 @@ onMounted(() => {
 			<Table v-else class="mt-4">
 				<TableHeader>
 					<TableRow>
-						<TableHead>Tags</TableHead>
+						<TableHead class="w-[180px]">Tags</TableHead>
 						<TableHead>Amount</TableHead>
 						<TableHead>Preferred account</TableHead>
 						<TableHead>Description</TableHead>
@@ -70,11 +77,11 @@ onMounted(() => {
 						<TableCell> {{ plan.amount }} {{ plan.currency }} </TableCell>
 
 						<TableCell class="font-medium">
-							{{ plan.preferred_account_info?.name || '- Not selected -' }}
+							{{ plan.preferred_account_info?.name || '-' }}
 						</TableCell>
 
 						<TableCell class="font-medium">
-							{{ plan.description }}
+							<span v-html="getFormatedDescription(plan.description)" />
 						</TableCell>
 
 						<TableCell class="text-right">
