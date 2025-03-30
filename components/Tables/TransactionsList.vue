@@ -3,6 +3,12 @@ import { Edit, Trash, ChevronUp, ChevronDown, MoveHorizontal, Scale } from 'luci
 import { ETransactionType } from '~/types/enums/transaction'
 import dayjs from 'dayjs'
 
+interface IPlanListProps {
+	period: string
+}
+
+const props = defineProps<IPlanListProps>()
+
 const numericSpaceId = Number(useRoute().params.space)
 
 const supabase = useSupabase()
@@ -12,10 +18,17 @@ const { list: accountList, updateData: updatedAccountsData } = useAccounts()
 const { list: tagsList, updateData: updateTagsData } = useTags()
 
 const updateData = async () => {
-	await updateTransactionsData()
 	await updatedAccountsData()
 	await updateTagsData()
 }
+
+watch(
+	() => props.period,
+	() => {
+		updateTransactionsData()
+	},
+	{ immediate: true },
+)
 
 onMounted(() => {
 	updateData()

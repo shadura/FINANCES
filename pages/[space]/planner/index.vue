@@ -1,38 +1,9 @@
 <script setup lang="ts">
-import dayjs from 'dayjs'
-
-interface IPeriod {
-	value: number
-	name: string
-}
+import getPeriodList from '@/utils/getPeriodList'
 
 const { period } = usePlans()
 
-const now = dayjs()
-const periodList = computed<IPeriod[]>(() => {
-	const result = []
-
-	for (let i = 0; i < 3; i++) {
-		result.push({
-			value: Number(now.subtract(3 - i, 'month').format('MMYYYY')),
-			name: `${now.subtract(3 - i, 'month').format('MMM YYYY')}${i === 2 ? ' - Prev month' : ''}`,
-		})
-	}
-
-	result.push({
-		value: Number(now.format('MMYYYY')),
-		name: `${now.format('MMM YYYY')} - Current month`,
-	})
-
-	for (let i = 1; i < 7; i++) {
-		result.push({
-			value: Number(now.add(i, 'month').format('MMYYYY')),
-			name: `${now.add(i, 'month').format('MMM YYYY')}${i === 1 ? ' - Next month' : ''}`,
-		})
-	}
-
-	return result
-})
+const periodList = getPeriodList()
 </script>
 
 <template>

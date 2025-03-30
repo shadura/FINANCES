@@ -4,6 +4,7 @@ import { useFilter } from 'reka-ui'
 import { PRIMARY_CURRENCY, SECONDARY_CURRENCY } from '~/const/currency.const'
 import type { DB, Tag } from '@/types/index.types'
 import type { ECurrency } from '@/types/enums/currency'
+import getFormatedDescription from '@/utils/getFormatedDescription'
 
 type TransactionReportItem = DB<'transactions'> & {
 	transaction_tags: { id: number; tags: { id: number; name: string; color: string } }[]
@@ -26,12 +27,12 @@ const result = ref<{ sum: number; list: TransactionReportItem[] }>({ sum: 0, lis
 const getResult = async () => {
 	if (!form.value.fromDate || !form.value.toDate) return
 
-	const tagsIds = selectedTags.value.map((tag) => tag.id)
+	const tagsIds = selectedTags.value.map((tag) => tag.id || 0).filter(Boolean) as number[]
 	result.value = await getTransactionsReport(form.value.fromDate, form.value.toDate, tagsIds)
 }
 
 // * Tags
-const selectedTags = ref<Tag[]>([])
+const selectedTags = ref<Partial<Tag>[]>([])
 const open = ref(false)
 const searchTerm = ref('')
 
@@ -62,7 +63,7 @@ const handleRemoveTag = () => {
 	}, 100)
 }
 
-const handleTagClick = (tag: Tag) => {
+const handleTagClick = (tag: Partial<Tag>) => {
 	const isTagSelected = selectedTags.value.some((t) => t.id === tag.id)
 	if (isTagSelected) return
 
@@ -86,7 +87,7 @@ watch(
 
 <template>
 	<div>
-		<h1 class="text-2xl font-bold">Reports</h1>
+		<h1 class="text-2xl font-bold">Transactions report</h1>
 
 		<div class="mt-4 flex gap-2 justify-start">
 			<div>
@@ -175,12 +176,12 @@ watch(
 								v-for="tag in item.transaction_tags"
 								:key="tag.id"
 								:color="tag.tags.color"
-								class="cursor-pointer"
+								class="cursor-pointer mr-1"
 								@click="handleTagClick(tag.tags)"
 								>{{ tag.tags.name }}</Tag
 							>
 
-							<span class="inline-block ml-2">{{ item.description }}</span>
+							<span class="inline-block ml-2" v-html="getFormatedDescription(item.description)" />
 						</div>
 						<div class="text-right">
 							<span>{{ useFormatAmount(item.amount_debit, item.account_from_info?.currency as ECurrency) }}</span>

@@ -9,12 +9,14 @@ const usePlan = () => {
 
 	const numericSpaceId = computed(() => Number(useRoute().params.space))
 
-	const period = useState('plans-period', () => Number(dayjs().format('MMYYYY')))
+	const period = useState('plans-period', () => dayjs().format('YYYY-MM-DD'))
 	const list = useState<PlanWithTags[]>('plans-list', () => [])
 
 	const isListLoading = useState('plans-loading', () => false)
 	const getPlans = async () => {
 		isListLoading.value = true
+
+		const formatedPeriod = Number(dayjs(period.value, 'YYYY-MM-DD').format('MMYYYY'))
 
 		try {
 			const { data, error } = await supabase
@@ -40,7 +42,7 @@ const usePlan = () => {
 				)
       `,
 				)
-				.eq('period_month_year', period.value)
+				.eq('period_month_year', formatedPeriod)
 				.eq('space_id', numericSpaceId.value)
 				.order('created_at', { ascending: false })
 

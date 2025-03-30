@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { Edit, Trash } from 'lucide-vue-next'
+import getFormatedDescription from '@/utils/getFormatedDescription'
 
 interface IPlanListProps {
-	period: number
+	period: string
 }
 
 const props = defineProps<IPlanListProps>()
@@ -25,13 +26,6 @@ onMounted(() => {
 	getTags()
 	updatedAccountsData()
 })
-
-const getFormatedDescription = (text?: string | null) => {
-	if (!text) return ''
-
-	const urlPattern = /(\bhttps?:\/\/[^\s]+)/g
-	return text.replace(urlPattern, (url) => `<a href="${url}" target="_blank" class="underline">link</a>`)
-}
 </script>
 
 <template>

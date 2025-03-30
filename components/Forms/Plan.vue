@@ -2,10 +2,11 @@
 import type { Account, PlanWithTags, Tag } from '@/types/index.types'
 import { useFilter } from 'reka-ui'
 import { currencyArray } from '@/types/enums/currency'
+import dayjs from 'dayjs'
 
 const props = defineProps<{
 	numericSpaceId: number
-	period: number
+	period: string
 	tagsList: null | Tag[]
 	plan?: PlanWithTags
 	accountList: null | Account[]
@@ -141,6 +142,8 @@ const createPlan = async () => {
 
 	isLoading.value = true
 
+	const formatedPeriod = Number(dayjs(props.period, 'YYYY-MM-DD').format('MMYYYY'))
+
 	try {
 		const { data } = await supabase
 			.from('plans')
@@ -148,7 +151,7 @@ const createPlan = async () => {
 				...editItem.value,
 				amount: editItem.value.amount || 0,
 				space_id: props.numericSpaceId,
-				period_month_year: props.period,
+				period_month_year: formatedPeriod,
 				preferred_account: editItem.value.preferred_account || null,
 			})
 			.select('id')
