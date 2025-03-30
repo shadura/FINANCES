@@ -53,6 +53,7 @@ onMounted(() => {
 						<TableHead>Tags</TableHead>
 						<TableHead>Amount</TableHead>
 						<TableHead>Description</TableHead>
+						<TableHead>Preferred account</TableHead>
 						<TableHead class="text-right w-[100px]">Actions</TableHead>
 					</TableRow>
 				</TableHeader>
@@ -67,6 +68,10 @@ onMounted(() => {
 							</div>
 						</TableCell>
 						<TableCell> {{ plan.amount }} {{ plan.currency }} </TableCell>
+
+						<TableCell class="font-medium">
+							{{ plan.preferred_account_info?.name || '- Not selected -' }}
+						</TableCell>
 
 						<TableCell class="font-medium">
 							{{ plan.description }}
