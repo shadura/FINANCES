@@ -52,8 +52,8 @@ onMounted(() => {
 					<TableRow>
 						<TableHead>Tags</TableHead>
 						<TableHead>Amount</TableHead>
-						<TableHead>Description</TableHead>
 						<TableHead>Preferred account</TableHead>
+						<TableHead>Description</TableHead>
 						<TableHead class="text-right w-[100px]">Actions</TableHead>
 					</TableRow>
 				</TableHeader>
