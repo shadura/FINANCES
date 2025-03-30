@@ -14,4 +14,4 @@ export type TransactionWithTags = Transaction & {
 	account_from_info?: Account
 	account_to_info?: Account
 }
-export type PlanWithTags = Plan & { plan_tags: { tag_id: number; tags: Tag }[] }
+export type PlanWithTags = Plan & { plan_tags: { tag_id: number; tags: Tag }[] } & { preferred_account_info?: Account }

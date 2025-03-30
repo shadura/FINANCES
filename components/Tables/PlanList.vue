@@ -11,6 +11,7 @@ const numericSpaceId = Number(useRoute().params.space)
 
 const { getPlans, isListLoading, list, updateData, deletePlan } = usePlans()
 const { list: tagsList, getTags } = useTags()
+const { list: accountList, updateData: updatedAccountsData } = useAccounts()
 
 watch(
 	() => props.period,
@@ -22,6 +23,7 @@ watch(
 
 onMounted(() => {
 	getTags()
+	updatedAccountsData()
 })
 </script>
 
@@ -37,7 +39,7 @@ onMounted(() => {
 					<Button>Add plan</Button>
 				</PopoverTrigger>
 				<PopoverContent class="w-140">
-					<FormsPlan :tagsList :numericSpaceId :period="props.period" @sent="updateData" />
+					<FormsPlan :tagsList :accountList :numericSpaceId :period="props.period" @sent="updateData" />
 				</PopoverContent>
 			</Popover>
 
@@ -79,7 +81,7 @@ onMounted(() => {
 										</Button>
 									</PopoverTrigger>
 									<PopoverContent class="w-140">
-										<FormsPlan :tagsList :numericSpaceId :period="props.period" :plan @sent="updateData" />
+										<FormsPlan :tagsList :accountList :numericSpaceId :period="props.period" :plan @sent="updateData" />
 									</PopoverContent>
 								</Popover>
 

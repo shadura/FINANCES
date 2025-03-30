@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { Edit, Trash } from 'lucide-vue-next'
-import type { Plan, Tag } from '~/types/index.types'
+import type { Account, PlanWithTags, Tag } from '@/types/index.types'
 import { useFilter } from 'reka-ui'
 import { currencyArray } from '@/types/enums/currency'
 
@@ -9,15 +8,17 @@ const props = defineProps<{
 	period: number
 	tagsList: null | Tag[]
 	plan?: PlanWithTags
+	accountList: null | Account[]
 }>()
 
 const emit = defineEmits(['sent'])
 
-const clearPlan = {
+const clearPlan: Partial<PlanWithTags> = {
 	description: '',
 	amount: 0,
 	currency: '',
 	is_income: false,
+	preferred_account: null,
 }
 
 const editItem = ref({ ...clearPlan })
@@ -33,6 +34,7 @@ const setTagData = () => {
 			amount: props.plan.amount,
 			currency: props.plan.currency || '',
 			is_income: props.plan.is_income || false,
+			preferred_account: props.plan.preferred_account || null,
 		}
 
 		if (props.plan?.plan_tags?.length) {
@@ -141,6 +143,7 @@ const createPlan = async () => {
 				amount: editItem.value.amount || 0,
 				space_id: props.numericSpaceId,
 				period_month_year: props.period,
+				preferred_account: editItem.value.preferred_account || null,
 			})
 			.select('id')
 			.single()
@@ -248,6 +251,22 @@ const handleSubmitForm = async () => {
 						</ComboboxAnchor>
 					</Combobox>
 				</div>
+
+				<div class="mb-2">
+					<Select v-model="editItem.preferred_account">
+						<SelectTrigger class="col-span-2">
+							<SelectValue placeholder="Preferred Account" />
+						</SelectTrigger>
+						<SelectContent>
+							<SelectGroup>
+								<SelectItem v-for="account in accountList" :value="account.id" :key="account.id">
+									{{ account.name }}
+								</SelectItem>
+							</SelectGroup>
+						</SelectContent>
+					</Select>
+				</div>
+
 				<div class="mb-2">
 					<Input
 						id="description"

@@ -59,6 +59,41 @@ const { convert } = useCurrency()
 		</CardContent>
 	</Card>
 
+	<Card v-if="getPlannedTags.byAccounts.length" class="mt-4">
+		<CardHeader>
+			<CardTitle>Preferred account</CardTitle>
+			<CardDescription>Here you can see preferred account to spend.</CardDescription>
+		</CardHeader>
+		<CardContent>
+			<div>
+				<ul class="mt-4">
+					<li
+						v-for="account in getPlannedTags.byAccounts"
+						:key="account.account.id"
+						class="flex gap-1 justify-between mb-2 pb-2 border-b"
+					>
+						<div>
+							<Tag>
+								{{ account.account.name }}
+							</Tag>
+						</div>
+
+						<div class="text-right">
+							<div>
+								<div class="text-xs text-right">{{ useFormatAmount(account.amount, account.currency) }}</div>
+								<div class="text-xs text-right">
+									{{
+										useFormatAmount(convert(account.amount, account.currency, SECONDARY_CURRENCY), SECONDARY_CURRENCY)
+									}}
+								</div>
+							</div>
+						</div>
+					</li>
+				</ul>
+			</div>
+		</CardContent>
+	</Card>
+
 	<Card class="mt-4">
 		<CardHeader>
 			<CardTitle>Planned tags amounts</CardTitle>

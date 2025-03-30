@@ -9,7 +9,11 @@ const useTags = () => {
 	const isListLoading = useState('tags-loading', () => false)
 	const getTags = async () => {
 		try {
-			const { data, error } = await supabase.from('tags').select('*').eq('space_id', numericSpaceId.value)
+			const { data, error } = await supabase
+				.from('tags')
+				.select('*')
+				.eq('space_id', numericSpaceId.value)
+				.eq('deleted', false)
 			if (error) throw error
 			list.value = data
 		} catch (err) {

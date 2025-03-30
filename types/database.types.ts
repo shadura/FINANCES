@@ -129,6 +129,7 @@ export type Database = {
           id: number
           is_income: boolean | null
           period_month_year: number
+          preferred_account: number | null
           space_id: number
         }
         Insert: {
@@ -139,6 +140,7 @@ export type Database = {
           id?: number
           is_income?: boolean | null
           period_month_year: number
+          preferred_account?: number | null
           space_id: number
         }
         Update: {
@@ -149,9 +151,17 @@ export type Database = {
           id?: number
           is_income?: boolean | null
           period_month_year?: number
+          preferred_account?: number | null
           space_id?: number
         }
         Relationships: [
+          {
+            foreignKeyName: "plans_preferred_account_fkey"
+            columns: ["preferred_account"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "plans_space_id_fkey"
             columns: ["space_id"]

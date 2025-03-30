@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import type { Tag, PlanWithTags } from '@/types/index.types'
+import type { Tag, PlanWithTags, Account } from '@/types/index.types'
 import { ECurrency } from '@/types/enums/currency'
 
 import { PRIMARY_CURRENCY } from '@/const/currency.const'
@@ -29,7 +29,15 @@ const usePlan = () => {
             name,
             color
           )
-        )
+        ),
+				preferred_account_info: preferred_account (
+					id,
+					name,
+					balance,
+					type,
+					currency,
+					deleted
+				)
       `,
 				)
 				.eq('period_month_year', period.value)
@@ -68,6 +76,7 @@ const usePlan = () => {
 					amount: 0,
 					list: [],
 				},
+				byAccounts: [],
 			}
 
 		const expenceList = list.value.filter((plan) => !plan.is_income)
@@ -108,6 +117,30 @@ const usePlan = () => {
 			})
 		})
 
+		interface IPreferredAccount {
+			account: Account
+			amount: number
+			currency: typeof PRIMARY_CURRENCY
+		}
+		const preferredAccountList = expenceList.reduce((acc, item): IPreferredAccount[] => {
+			if (!item.preferred_account_info) return acc
+
+			const existedAccount = acc.find((accountItem) => accountItem.account.id === item.preferred_account_info?.id)
+
+			if (existedAccount) {
+				existedAccount.amount += convert(item.amount, item.currency as ECurrency, PRIMARY_CURRENCY)
+				return acc
+			}
+
+			const newItem: IPreferredAccount = {
+				account: item.preferred_account_info,
+				amount: convert(item.amount, item.currency as ECurrency, PRIMARY_CURRENCY),
+				currency: PRIMARY_CURRENCY,
+			}
+
+			return [...acc, newItem]
+		}, [] as IPreferredAccount[])
+
 		return {
 			income: {
 				amount: incomeAmount,
@@ -122,6 +155,7 @@ const usePlan = () => {
 						persent: Math.round((tag.amount / expenceAmount) * 100 * 100) / 100,
 					})),
 			},
+			byAccounts: preferredAccountList,
 		}
 	})
 
