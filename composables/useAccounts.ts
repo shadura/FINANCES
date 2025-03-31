@@ -47,26 +47,88 @@ const useAccounts = () => {
 						currency: SECONDARY_CURRENCY,
 					},
 				},
-				list: [],
+				byAccount: [],
+				byType: [],
+				byCurrency: [],
 			}
 
 		const { convert } = useCurrency()
 
-		const accountsList = list.value
+		const byAccount = list.value
 			.filter((account) => account.is_net_worth)
 			.map((account) => {
 				return {
-					amount: account.balance,
-					currency: account.currency as ECurrency,
 					name: account.name,
-					converted: {
-						amount: convert(account.balance || 0, account.currency as ECurrency, PRIMARY_CURRENCY),
-						currency: PRIMARY_CURRENCY,
+					amount: {
+						primary: {
+							value: convert(account.balance || 0, account.currency as ECurrency, PRIMARY_CURRENCY),
+							currency: PRIMARY_CURRENCY,
+						},
 					},
 				}
 			})
 
-		const sum = accountsList.reduce((acc, account) => acc + account.converted.amount, 0)
+		const sum = byAccount.reduce((acc, account) => acc + account.amount.primary.value, 0)
+
+		const byType = list.value
+			.filter((account) => account.is_net_worth)
+			.reduce((acc: any[], account) => {
+				const item = acc.find((a) => a.name === account.type)
+
+				if (item) {
+					item.amount.primary = {
+						value:
+							item.amount.primary.value +
+							convert(account.balance || 0, account.currency as ECurrency, PRIMARY_CURRENCY),
+						currency: PRIMARY_CURRENCY,
+					}
+
+					return acc
+				}
+
+				return [
+					...acc,
+					{
+						name: account.type,
+						amount: {
+							primary: {
+								value: convert(account.balance || 0, account.currency as ECurrency, PRIMARY_CURRENCY),
+								currency: PRIMARY_CURRENCY,
+							},
+						},
+					},
+				]
+			}, [])
+
+		const byCurrency = list.value
+			.filter((account) => account.is_net_worth)
+			.reduce((acc: any[], account) => {
+				const item = acc.find((a) => a.name === account.currency)
+
+				if (item) {
+					item.amount.primary = {
+						value:
+							item.amount.primary.value +
+							convert(account.balance || 0, account.currency as ECurrency, PRIMARY_CURRENCY),
+						currency: PRIMARY_CURRENCY,
+					}
+
+					return acc
+				}
+
+				return [
+					...acc,
+					{
+						name: account.currency,
+						amount: {
+							primary: {
+								value: convert(account.balance || 0, account.currency as ECurrency, PRIMARY_CURRENCY),
+								currency: PRIMARY_CURRENCY,
+							},
+						},
+					},
+				]
+			}, [])
 
 		return {
 			amount: {
@@ -79,7 +141,9 @@ const useAccounts = () => {
 					currency: SECONDARY_CURRENCY,
 				},
 			},
-			list: accountsList,
+			byAccount,
+			byType,
+			byCurrency,
 		}
 	})
 

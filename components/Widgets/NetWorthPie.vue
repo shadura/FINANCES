@@ -5,6 +5,16 @@ import { COLORS } from '@/const/colors.const'
 
 const { convert } = useCurrency()
 
+interface Item {
+	name: string
+	amount: {
+		primary: {
+			value: number
+			currency: ECurrency
+		}
+	}
+}
+
 const props = defineProps<{
 	data: {
 		amount: {
@@ -17,27 +27,23 @@ const props = defineProps<{
 				currency: ECurrency
 			}
 		}
-		list: {
-			amount: number | null
-			currency: ECurrency
-			name: string
-			converted: {
-				amount: number
-				currency: ECurrency
-			}
-		}[]
+		byAccount: Item[]
+		byType: Item[]
+		byCurrency: Item[]
 	}
 }>()
 
+const tab = ref<'byAccount' | 'byType' | 'byCurrency'>('byType')
+
 const series = computed(() => {
-	return props.data.list.map((item) => item.converted.amount)
+	return props.data[tab.value].map((item) => item.amount.primary.value)
 })
 
 const labels = computed(() => {
-	return props.data.list.map((item) => item.name)
+	return props.data[tab.value].map((item) => item.name)
 })
 
-const getChartOptions = () => {
+const getChartOptions = computed(() => {
 	return {
 		series: series.value,
 		colors: COLORS,
@@ -100,30 +106,19 @@ const getChartOptions = () => {
 		yaxis: {
 			labels: {
 				formatter: function (value: any) {
-					return value
+					return Math.round((value / props.data.amount.primary.value) * 100 * 100) / 100 + '%'
 				},
-			},
-		},
-		xaxis: {
-			labels: {
-				formatter: function (value: any) {
-					return value
-				},
-			},
-			axisTicks: {
-				show: false,
-			},
-			axisBorder: {
-				show: false,
 			},
 		},
 	}
-}
+})
 
-const initChart = () => {
+const chart = ref<ApexCharts | null>(null)
+
+const init = () => {
 	if (document.getElementById('donut-chart') && typeof ApexCharts !== 'undefined') {
-		const chart = new ApexCharts(document.getElementById('donut-chart'), getChartOptions())
-		chart.render()
+		chart.value = new ApexCharts(document.getElementById('donut-chart'), getChartOptions.value)
+		chart.value.render()
 
 		// Get all the checkboxes by their class name
 		const checkboxes = document.querySelectorAll('#devices input[type="checkbox"]')
@@ -157,14 +152,18 @@ const initChart = () => {
 	}
 }
 
-// onMounted(() => {
-// 	initChart()
-// })
+onMounted(() => {
+	init()
+})
 
 watch(
-	() => props.data,
+	() => getChartOptions.value,
 	() => {
-		initChart()
+		setTimeout(() => {
+			if (chart.value) {
+				chart.value.updateOptions(getChartOptions.value)
+			}
+		}, 100)
 	},
 	{ deep: true, immediate: true },
 )
@@ -178,6 +177,13 @@ watch(
 		</CardHeader>
 		<CardContent>
 			<div class="">
+				<Tabs v-model="tab" class="w-full" @change="init">
+					<TabsList>
+						<TabsTrigger value="byType"> by Type </TabsTrigger>
+						<TabsTrigger value="byCurrency"> by Currency </TabsTrigger>
+						<TabsTrigger value="byAccount"> by Account </TabsTrigger>
+					</TabsList>
+				</Tabs>
 				<div class="py-6" id="donut-chart"></div>
 			</div>
 		</CardContent>

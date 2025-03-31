@@ -13,7 +13,12 @@ const useCurrency = () => {
 
 	const getCurrencyRates = async () => {
 		try {
-			const { data, error } = await supabase.from('currency_rates').select().single()
+			const { data, error } = await supabase
+				.from('currency_rates')
+				.select('*')
+				.order('date', { ascending: false })
+				.limit(1)
+				.single()
 			if (error) throw error
 
 			currentCurrencyRates.value = data
