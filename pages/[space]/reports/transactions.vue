@@ -93,7 +93,7 @@ watch(
 			<div>
 				<Input
 					id="name"
-					type="text"
+					type="date"
 					v-model="form.fromDate"
 					class="col-span-2 h-8"
 					placeholder="YYYY-MM-DD"
@@ -103,7 +103,7 @@ watch(
 			<div>
 				<Input
 					id="name"
-					type="text"
+					type="date"
 					v-model="form.toDate"
 					class="col-span-2 h-8"
 					placeholder="YYYY-MM-DD"

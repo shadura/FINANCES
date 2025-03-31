@@ -62,7 +62,7 @@ onMounted(() => {
 					<TableRow v-for="plan in list" :key="plan.id">
 						<TableCell class="font-medium">
 							<div class="flex gap-1">
-								<Tag v-if="plan.is_income" color="#13dd13"> Income </Tag>
+								<Tag v-if="plan.is_income" color="#E0D7F7"> Income </Tag>
 								<Tag v-for="tag in plan.plan_tags" :key="tag.tags.id" :color="tag.tags.color">
 									{{ tag.tags.name }}
 								</Tag>

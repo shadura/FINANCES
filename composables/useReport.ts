@@ -16,6 +16,8 @@ const useReport = () => {
 
 	const isReportLoading = useState('report-loading', () => false)
 	const getTransactionsReport = async (fromDate: string, toDate: string, tags?: number[]) => {
+		const adjustedToDate = dayjs(toDate).endOf('day').toISOString()
+
 		const { data, error } = await supabase
 			.from('transactions')
 			.select(
@@ -50,7 +52,7 @@ const useReport = () => {
 			.eq('space_id', numericSpaceId.value)
 			.eq('type', 'expense')
 			.gte('date', fromDate)
-			.lte('date', toDate)
+			.lte('date', adjustedToDate)
 
 		if (error) {
 			console.error(error)
