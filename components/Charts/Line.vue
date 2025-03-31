@@ -113,7 +113,6 @@ const getChartOptions = computed(() => ({
 
 const chart = ref<any>(null)
 const init = () => {
-	console.log('init chart', document.getElementById('labels-chart'))
 	if (document.getElementById('labels-chart') && typeof ApexCharts !== 'undefined') {
 		chart.value = new ApexCharts(document.getElementById('labels-chart'), getChartOptions.value)
 		console.log('chart in', chart.value)
