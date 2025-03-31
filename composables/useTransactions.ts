@@ -16,7 +16,7 @@ const useTransactions = () => {
 			isListLoading.value = true
 
 			const date_from = dayjs(period.value, 'YYYY-MM-DD').startOf('month').format('YYYY-MM-DD')
-			const date_to = dayjs(period.value, 'YYYY-MM-DD').endOf('month').format('YYYY-MM-DD')
+			const date_to = dayjs(period.value, 'YYYY-MM-DD').endOf('month').add(1, 'day').format('YYYY-MM-DD')
 
 			let query = supabase
 				.from('transactions')
