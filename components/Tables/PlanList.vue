@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Edit, Trash } from 'lucide-vue-next'
+import { Edit, Trash, CircleFadingPlus } from 'lucide-vue-next'
 import getFormatedDescription from '@/utils/getFormatedDescription'
 
 interface IPlanListProps {
@@ -80,6 +80,17 @@ onMounted(() => {
 
 						<TableCell class="text-right">
 							<div class="flex gap-1 justify-end">
+								<Popover>
+									<PopoverTrigger as-child>
+										<Button variant="ghost" size="icon">
+											<CircleFadingPlus />
+										</Button>
+									</PopoverTrigger>
+									<PopoverContent class="w-140">
+										<FormsTransaction :accountList :tagsList :numericSpaceId :plan @sent="updateData" />
+									</PopoverContent>
+								</Popover>
+
 								<Popover>
 									<PopoverTrigger as-child>
 										<Button variant="ghost" size="icon">

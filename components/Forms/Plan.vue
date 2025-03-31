@@ -286,7 +286,14 @@ const handleSubmitForm = async () => {
 					/>
 				</div>
 				<div class="mb-2">
-					<Input id="amount" type="number" v-model="editItem.amount" class="col-span-2 h-8" placeholder="Amount" />
+					<Input
+						id="amount"
+						type="number"
+						step="0.01"
+						v-model="editItem.amount"
+						class="col-span-2 h-8"
+						placeholder="Amount"
+					/>
 				</div>
 				<div class="mb-2">
 					<Select v-model="editItem.currency">

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Account, Tag, Transaction, TransactionWithTags } from '~/types/index.types'
+import type { Account, Tag, Transaction, TransactionWithTags, PlanWithTags } from '~/types/index.types'
 import { useFilter } from 'reka-ui'
 import { ETransactionType, transactionTypeArray } from '@/types/enums/transaction'
 import { Loader2 } from 'lucide-vue-next'
@@ -10,6 +10,8 @@ const props = defineProps<{
 	accountList: null | Account[]
 	tagsList: null | Tag[]
 	transaction?: TransactionWithTags
+
+	plan?: PlanWithTags
 }>()
 
 const emit = defineEmits(['sent'])
@@ -255,12 +257,23 @@ const setTransactionData = () => {
 			}))
 		}
 	}
+
+	console.log('props.plan', props.plan)
+	if (props.plan) {
+		editItem.value.type = ETransactionType.EXPENSE
+		editItem.value.account_from = props.plan.preferred_account || null
+		editItem.value.amount_debit = props.plan.amount
+		editItem.value.description = props.plan.description || ''
+
+		selectedTags.value = props.plan.plan_tags.map((tr) => ({
+			id: tr.tags.id,
+			name: tr.tags.name,
+		}))
+	}
 }
 
 onMounted(() => {
-	if (props.transaction) {
-		setTransactionData()
-	}
+	setTransactionData()
 })
 const editTransaction = async (id: number) => {
 	if (isDisabled.value) return
@@ -334,7 +347,7 @@ const handleSubmitForm = async () => {
 					</Select>
 
 					<div class="relative mt-2">
-						<Input v-model="editItem.amount_debit" class="pr-10" type="number" placeholder="Amount" />
+						<Input v-model="editItem.amount_debit" step="0.01" class="pr-10" type="number" placeholder="Amount" />
 
 						<div class="absolute top-0 right-0 text-sm h-full flex items-center px-2 text-muted-foreground">
 							<span>{{ getAccountFromCurrency }}</span>
@@ -363,7 +376,7 @@ const handleSubmitForm = async () => {
 					</Select>
 
 					<div class="relative mt-2">
-						<Input v-model="editItem.amount_credit" class="pr-10" type="number" placeholder="Amount" />
+						<Input v-model="editItem.amount_credit" step="0.01" class="pr-10" type="number" placeholder="Amount" />
 
 						<div class="absolute top-0 right-0 text-sm h-full flex items-center px-2 text-muted-foreground">
 							<span>{{ getAccountToCurrency }}</span>
