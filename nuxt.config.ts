@@ -22,6 +22,12 @@ export default defineNuxtConfig({
 		componentDir: './components/ui',
 	},
 
+	app: {
+		head: {
+			title: 'Finance',
+		},
+	},
+
 	routeRules: {
 		'/**': { ssr: false, cache: false, headers: { 'cache-control': 'no-store' } },
 	},
