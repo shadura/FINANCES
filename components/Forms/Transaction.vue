@@ -33,6 +33,7 @@ const clearTransaction: TransactionForm = {
 	amount_credit: 0,
 	description: '',
 	date: now(getLocalTimeZone()),
+	plan_id: null,
 }
 
 const supabase = useSupabase()
@@ -258,7 +259,6 @@ const setTransactionData = () => {
 		}
 	}
 
-	console.log('props.plan', props.plan)
 	if (props.plan) {
 		editItem.value.type = ETransactionType.EXPENSE
 		editItem.value.account_from = props.plan.preferred_account || null
@@ -269,6 +269,8 @@ const setTransactionData = () => {
 			id: tr.tags.id,
 			name: tr.tags.name,
 		}))
+
+		editItem.value.plan_id = props.plan?.id || null
 	}
 }
 

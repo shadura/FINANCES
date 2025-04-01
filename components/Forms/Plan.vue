@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Loader2 } from 'lucide-vue-next'
 import type { Account, PlanWithTags, Tag } from '@/types/index.types'
 import { useFilter } from 'reka-ui'
 import { currencyArray } from '@/types/enums/currency'
@@ -154,7 +155,7 @@ const createPlan = async () => {
 				period_month_year: formatedPeriod,
 				preferred_account: editItem.value.preferred_account || null,
 			})
-			.select('id')
+			.select('*')
 			.single()
 
 		const plan_id = data?.id

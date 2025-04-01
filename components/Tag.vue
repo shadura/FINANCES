@@ -4,8 +4,9 @@ const props = defineProps<{
 }>()
 
 const textColor = computed(() => {
+	if (!props.color || props.color === 'default') return '#000000'
+
 	let hex = props.color
-	if (!hex) return '#000000'
 
 	hex = hex.replace('#', '')
 

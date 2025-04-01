@@ -1,22 +1,23 @@
 import type { Tag, TransactionWithTags } from '@/types/index.types'
 import dayjs from 'dayjs'
+import { PRIMARY_CURRENCY, SECONDARY_CURRENCY } from '~/const/currency.const'
+import type { ECurrency } from '~/types/enums/currency'
+import { ETransactionType } from '~/types/enums/transaction'
 
 const useTransactions = () => {
 	const supabase = useSupabase()
 
 	const numericSpaceId = computed(() => Number(useRoute().params.space))
 
-	const period = useState('transactions-period', () => dayjs().format('YYYY-MM-DD'))
-
 	const list = useState<TransactionWithTags[]>('transactions-list', () => [])
 
 	const isListLoading = useState('transactions-loading', () => false)
-	const getList = async () => {
+	const getList = async (period: string) => {
 		try {
 			isListLoading.value = true
 
-			const date_from = dayjs(period.value, 'YYYY-MM-DD').startOf('month').format('YYYY-MM-DD')
-			const date_to = dayjs(period.value, 'YYYY-MM-DD').endOf('month').add(1, 'day').format('YYYY-MM-DD')
+			const date_from = dayjs(period, 'YYYY-MM-DD').startOf('month').format('YYYY-MM-DD')
+			const date_to = dayjs(period, 'YYYY-MM-DD').endOf('month').add(1, 'day').format('YYYY-MM-DD')
 
 			let query = supabase
 				.from('transactions')
@@ -72,16 +73,50 @@ const useTransactions = () => {
 		}
 	}
 
-	const updateData = async () => {
-		await getList()
-	}
+	const getSum = computed(() => {
+		const { convert } = useCurrency()
+
+		if (!list.value)
+			return {
+				primary: {
+					value: 0,
+					currency: PRIMARY_CURRENCY,
+				},
+				secondary: {
+					value: 0,
+					currency: SECONDARY_CURRENCY,
+				},
+			}
+
+		const primary = list.value.reduce((acc, transaction) => {
+			if (transaction.amount_debit !== null && transaction.account_from_info?.currency) {
+				return (
+					acc + convert(transaction.amount_debit, transaction.account_from_info.currency as ECurrency, PRIMARY_CURRENCY)
+				)
+			}
+
+			return acc
+		}, 0)
+
+		const secondary = convert(primary, PRIMARY_CURRENCY, SECONDARY_CURRENCY)
+
+		return {
+			primary: {
+				value: primary,
+				currency: PRIMARY_CURRENCY,
+			},
+			secondary: {
+				value: secondary,
+				currency: SECONDARY_CURRENCY,
+			},
+		}
+	})
 
 	return {
-		period,
 		getList,
 		isListLoading,
 		list,
-		updateData,
+		getSum,
 	}
 }
 

@@ -9,14 +9,13 @@ const usePlan = () => {
 
 	const numericSpaceId = computed(() => Number(useRoute().params.space))
 
-	const period = useState('plans-period', () => dayjs().format('YYYY-MM-DD'))
 	const list = useState<PlanWithTags[]>('plans-list', () => [])
 
 	const isListLoading = useState('plans-loading', () => false)
-	const getPlans = async () => {
+	const getList = async (period: string) => {
 		isListLoading.value = true
 
-		const formatedPeriod = Number(dayjs(period.value, 'YYYY-MM-DD').format('MMYYYY'))
+		const formatedPeriod = Number(dayjs(period, 'YYYY-MM-DD').format('MMYYYY'))
 
 		try {
 			const { data, error } = await supabase
@@ -56,15 +55,12 @@ const usePlan = () => {
 		}
 	}
 
-	const updateData = async () => {
-		await getPlans()
-	}
-
 	const deletePlan = async (id: number) => {
 		if (!confirm('Are you sure you want to delete this plan?')) return
 
 		await supabase.from('plans').delete().eq('id', id)
-		await updateData()
+
+		list.value = list.value.filter((plan) => plan.id !== id)
 	}
 
 	const getPlannedTags = computed(() => {
@@ -162,12 +158,10 @@ const usePlan = () => {
 	})
 
 	return {
-		getPlans,
+		getList,
 		deletePlan,
-		updateData,
 		list,
 		isListLoading,
-		period,
 		getPlannedTags,
 	}
 }

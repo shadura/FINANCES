@@ -7,7 +7,7 @@ const useTags = () => {
 	const list = useState<Tag[]>('tags-list', () => [])
 
 	const isListLoading = useState('tags-loading', () => false)
-	const getTags = async () => {
+	const getList = async () => {
 		try {
 			const { data, error } = await supabase
 				.from('tags')
@@ -22,15 +22,10 @@ const useTags = () => {
 		}
 	}
 
-	const updateData = async () => {
-		await getTags()
-	}
-
 	return {
-		getTags,
+		getList,
 		isListLoading,
 		list,
-		updateData,
 	}
 }
 

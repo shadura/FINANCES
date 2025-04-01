@@ -30,10 +30,6 @@ const useAccounts = () => {
 		}
 	}
 
-	const updateData = async () => {
-		await getList()
-	}
-
 	const getNetWorhInfo = computed(() => {
 		if (!list.value.length)
 			return {
@@ -150,7 +146,6 @@ const useAccounts = () => {
 	return {
 		getList,
 		list,
-		updateData,
 		isListLoading,
 		getNetWorhInfo,
 	}

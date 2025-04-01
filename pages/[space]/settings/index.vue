@@ -11,7 +11,7 @@ const space = await getSpace(Number(spaceId))
 
 		<div class="grid grid-cols-2 gap-4 mt-8" style="grid-template-columns: 2fr 1fr">
 			<div>
-				<TablesAccountsList />
+				<WidgetsAccounts />
 			</div>
 			<div>
 				<Card>
@@ -25,7 +25,7 @@ const space = await getSpace(Number(spaceId))
 					</CardContent>
 				</Card>
 
-				<TablesTagsList class="mt-4" />
+				<WidgetsTags class="mt-4" />
 			</div>
 		</div>
 	</div>

@@ -2,22 +2,36 @@
 import { Edit, Trash, ChevronUp, ChevronDown, MoveHorizontal, Scale, BanknoteArrowDown } from 'lucide-vue-next'
 import getPeriodList from '@/utils/getPeriodList'
 import { SECONDARY_CURRENCY, PRIMARY_CURRENCY } from '@/const/currency.const'
+import dayjs from 'dayjs'
 
-const numericSpaceId = Number(useRoute().params.space)
-
-const { period, getPlannedTags } = usePlans()
-const { list: accountList, updateData: updatedAccountsData } = useAccounts()
-const { list: tagsList, updateData: updateTagsData } = useTags()
+const { getPlannedTags, getList: getPlans } = usePlans()
+const { list: transactionList, getList: getTransactions, getSum: getTransactionsSum } = useTransactions()
+const { list: accountList, getList: getAccounts } = useAccounts()
+// const { list: tagsList, getList: getTags } = useTags()
 const { convert } = useCurrency()
 
 const periodList = getPeriodList()
+const period = ref(dayjs().format('YYYY-MM-DD'))
 
-const updateData = () => {}
+const updateData = () => {
+	getPlans(period.value)
+	getTransactions(period.value)
+	getAccounts()
+	// updateTagsData()
+}
+
+watch(
+	period,
+	() => {
+		updateData()
+	},
+	{ immediate: true },
+)
 </script>
 
 <template>
 	<div>
-		<h1 class="text-2xl font-bold">Test</h1>
+		<h1 class="text-2xl font-bold">Budget</h1>
 
 		<div class="mt-4">
 			<Select v-model="period">
@@ -94,70 +108,47 @@ const updateData = () => {}
 							<div>
 								<div class="mb-1 text-sm text-muted-foreground">Spent</div>
 								<div class="font-bold text-lg">
-									{{ useFormatAmount(1000, PRIMARY_CURRENCY) }}
+									{{ useFormatAmount(getTransactionsSum.primary.value, PRIMARY_CURRENCY) }}
 								</div>
 								<div class="text-xs">
-									{{ useFormatAmount(convert(1000, PRIMARY_CURRENCY, SECONDARY_CURRENCY), SECONDARY_CURRENCY) }}
+									{{
+										useFormatAmount(
+											convert(getTransactionsSum.primary.value, PRIMARY_CURRENCY, SECONDARY_CURRENCY),
+											SECONDARY_CURRENCY,
+										)
+									}}
 								</div>
 							</div>
 
 							<div>
 								<div class="mb-1 text-sm text-muted-foreground">Left to spend</div>
 								<div class="font-bold text-lg">
-									{{ useFormatAmount(1500, PRIMARY_CURRENCY) }}
+									{{
+										useFormatAmount(getPlannedTags.expense.amount - getTransactionsSum.primary.value, PRIMARY_CURRENCY)
+									}}
 								</div>
 								<div class="text-xs">
-									{{ useFormatAmount(convert(1500, PRIMARY_CURRENCY, SECONDARY_CURRENCY), SECONDARY_CURRENCY) }}
+									{{
+										useFormatAmount(
+											convert(
+												getPlannedTags.expense.amount - getTransactionsSum.primary.value,
+												PRIMARY_CURRENCY,
+												SECONDARY_CURRENCY,
+											),
+											SECONDARY_CURRENCY,
+										)
+									}}
 								</div>
 							</div>
 						</div>
 					</CardContent>
 				</Card>
 
-				<TablesPlanList :period class="mt-4" />
+				<WidgetsPlan :period class="mt-4" />
 			</div>
 
 			<div>
-				<Card class="mb-4">
-					<CardHeader>
-						<CardTitle>Transactions</CardTitle>
-						<CardDescription>Here you can see your transactions.</CardDescription>
-					</CardHeader>
-					<CardContent>
-						<Popover>
-							<PopoverTrigger as-child>
-								<Button>Add transaction</Button>
-							</PopoverTrigger>
-							<PopoverContent class="w-140">
-								<FormsTransaction :accountList :tagsList :numericSpaceId @sent="updateData" />
-							</PopoverContent>
-						</Popover>
-
-						<ScrollArea class="h-80 w-full mt-4">
-							<Popover>
-								<PopoverTrigger as-child>
-									<div class="flex items-center space-x-4 rounded-md border px-4 py-4 mb-2 cursor-pointer">
-										<BanknoteArrowDown :size="24" />
-										<div class="flex-1 space-y-1">
-											<p class="text-sm font-medium leading-none">Mono Rose</p>
-
-											<div class="mt-2">
-												<Tag>food</Tag>
-											</div>
-											<p class="text-sm text-muted-foreground">Some description</p>
-										</div>
-										<div class="text-right">1 000 UAH</div>
-									</div>
-								</PopoverTrigger>
-								<PopoverContent class="w-140">
-									<FormsTransaction :accountList :tagsList :numericSpaceId @sent="updateData" />
-								</PopoverContent>
-							</Popover>
-						</ScrollArea>
-					</CardContent>
-				</Card>
-
-				<WidgetsPlannedTagsStat />
+				<WidgetsTransactions :period />
 			</div>
 		</div>
 	</div>
