@@ -20,14 +20,9 @@ const items = computed(() => [
 		icon: Focus,
 	},
 	{
-		title: 'Planner',
-		url: `/${space.value}/planner`,
+		title: 'Budget',
+		url: `/${space.value}/budget`,
 		icon: Wallet,
-	},
-	{
-		title: 'Transactions',
-		url: `/${space.value}/transactions`,
-		icon: ArrowLeftRight,
 	},
 	{
 		title: 'Subscriptions',
