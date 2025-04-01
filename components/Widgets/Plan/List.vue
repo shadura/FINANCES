@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import type { Account, PlanWithTags, Tag } from '~/types/index.types'
+import { Edit, Trash, CircleFadingPlus } from 'lucide-vue-next'
+import getFormatedDescription from '@/utils/getFormatedDescription'
 
 const props = defineProps<{
 	list: PlanWithTags[]

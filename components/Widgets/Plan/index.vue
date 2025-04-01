@@ -1,7 +1,4 @@
 <script setup lang="ts">
-import { Edit, Trash, CircleFadingPlus } from 'lucide-vue-next'
-import getFormatedDescription from '@/utils/getFormatedDescription'
-
 interface IPlanListProps {
 	period: string
 }
