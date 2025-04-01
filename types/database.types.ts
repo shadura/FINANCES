@@ -309,6 +309,7 @@ export type Database = {
           date: string
           description: string | null
           id: number
+          plan_id: number | null
           space_id: number
           type: string
         }
@@ -321,6 +322,7 @@ export type Database = {
           date?: string
           description?: string | null
           id?: number
+          plan_id?: number | null
           space_id: number
           type: string
         }
@@ -333,6 +335,7 @@ export type Database = {
           date?: string
           description?: string | null
           id?: number
+          plan_id?: number | null
           space_id?: number
           type?: string
         }
@@ -349,6 +352,13 @@ export type Database = {
             columns: ["account_to"]
             isOneToOne: false
             referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transactions_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "plans"
             referencedColumns: ["id"]
           },
           {
