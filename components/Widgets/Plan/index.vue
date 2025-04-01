@@ -7,8 +7,7 @@ const props = defineProps<IPlanListProps>()
 
 const numericSpaceId = Number(useRoute().params.space)
 
-const { getList: getPlans, isListLoading, list, deletePlan } = usePlans()
-const { getList: getTransactions } = useTransactions()
+const { list: plansList, getList: getPlans, deletePlan } = usePlans()
 const { list: tagsList, getList: getTags } = useTags()
 const { list: accountList, getList: getAccounts } = useAccounts()
 
@@ -26,7 +25,7 @@ onMounted(() => {
 })
 
 const updateData = () => {
-	getTransactions(props.period)
+	getPlans(props.period)
 }
 </script>
 
@@ -46,11 +45,11 @@ const updateData = () => {
 				</PopoverContent>
 			</Popover>
 
-			<div v-if="isListLoading">
+			<!-- <div v-if="isListLoading">
 				<Loader />
-			</div>
+			</div> -->
 
-			<Tabs v-else default-value="list" class="w-full mt-4">
+			<Tabs default-value="list" class="w-full mt-4">
 				<TabsList>
 					<TabsTrigger value="list"> List </TabsTrigger>
 					<TabsTrigger value="tags"> By Tags </TabsTrigger>
@@ -58,7 +57,7 @@ const updateData = () => {
 				</TabsList>
 				<TabsContent value="list">
 					<WidgetsPlanList
-						:list="list"
+						:list="plansList"
 						:tagsList="tagsList"
 						:accountList="accountList"
 						:numericSpaceId="numericSpaceId"
