@@ -12,7 +12,7 @@ type TransactionReportItem = DB<'transactions'> & {
 	account_to_info: DB<'accounts'> | null
 }
 
-const { getTags, list: tags } = useTags()
+const { getList: getTags, list: tags } = useTags()
 const { getTransactionsReport, isReportLoading } = useReport()
 const { convert } = useCurrency()
 

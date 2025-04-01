@@ -4,7 +4,7 @@ const props = defineProps<{
 }>()
 
 const textColor = computed(() => {
-	if (!props.color || props.color === 'default') return '#000000'
+	if (!props.color || props.color === 'default') return ''
 
 	let hex = props.color
 

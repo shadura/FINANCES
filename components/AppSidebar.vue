@@ -65,7 +65,7 @@ const signOut = async () => {
 	<Sidebar>
 		<SidebarHeader>
 			<div class="flex items-center">
-				<h1 class="text-xl font-bold text-gray-900">Finance</h1>
+				<h1 class="text-xl font-bold text-primary">Finance</h1>
 			</div>
 		</SidebarHeader>
 		<SidebarContent>

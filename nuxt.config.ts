@@ -1,7 +1,7 @@
 export default defineNuxtConfig({
 	compatibilityDate: '2024-11-01',
 	devtools: { enabled: true },
-	modules: ['@nuxtjs/tailwindcss', '@nuxtjs/supabase', 'shadcn-nuxt'],
+	modules: ['@nuxtjs/tailwindcss', '@nuxtjs/color-mode', '@nuxtjs/supabase', 'shadcn-nuxt'],
 	supabase: {
 		// Options
 		redirectOptions: {
@@ -10,6 +10,11 @@ export default defineNuxtConfig({
 			exclude: ['/auth', '/auth/callback'],
 		},
 	},
+
+	colorMode: {
+		classSuffix: '',
+	},
+
 	shadcn: {
 		/**
 		 * Prefix for all the imported component
