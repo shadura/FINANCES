@@ -6,17 +6,17 @@ const numericSpaceId = Number(useRoute().params.space)
 
 const supabase = useSupabase()
 
-const { isListLoading, list: tagsList, updateData } = useTags()
+const { getList: getTags, list: tagsList } = useTags()
 
 const deleteTag = async (id: number) => {
 	if (!confirm('Are you sure you want to delete this tag?')) return
 
 	await supabase.from('tags').update({ deleted: true }).eq('id', id)
-	await updateData()
+	await getTags()
 }
 
 onMounted(() => {
-	updateData()
+	getTags()
 })
 </script>
 
@@ -32,15 +32,11 @@ onMounted(() => {
 					<Button>Add tag</Button>
 				</PopoverTrigger>
 				<PopoverContent class="w-80">
-					<FormsTag :numericSpaceId @sent="updateData" />
+					<FormsTag :numericSpaceId @sent="getTags" />
 				</PopoverContent>
 			</Popover>
 
-			<div v-if="isListLoading">
-				<Loader />
-			</div>
-
-			<Table v-else class="mt-4">
+			<Table class="mt-4">
 				<TableHeader>
 					<TableRow>
 						<TableHead> Name </TableHead>
@@ -63,7 +59,7 @@ onMounted(() => {
 										</Button>
 									</PopoverTrigger>
 									<PopoverContent class="w-80">
-										<FormsTag :numericSpaceId :tag="tag" @sent="updateData" />
+										<FormsTag :numericSpaceId :tag="tag" @sent="getTags" />
 									</PopoverContent>
 								</Popover>
 

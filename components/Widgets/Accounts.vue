@@ -5,18 +5,18 @@ const numericSpaceId = Number(useRoute().params.space)
 
 const supabase = useSupabase()
 
-const { isListLoading, list: accountsList, updateData } = useAccounts()
+const { getList: getAccounts, list: accountsList } = useAccounts()
 
 const deleteAccount = async (id: number) => {
 	if (!confirm('Are you sure you want to delete this account?')) return
 
 	await supabase.from('accounts').update({ deleted: true }).eq('id', id)
 
-	await updateData()
+	await getAccounts()
 }
 
 onMounted(() => {
-	updateData()
+	getAccounts()
 })
 </script>
 
@@ -32,15 +32,11 @@ onMounted(() => {
 					<Button>Add account</Button>
 				</PopoverTrigger>
 				<PopoverContent class="w-80">
-					<FormsAccount :numericSpaceId @sent="updateData" />
+					<FormsAccount :numericSpaceId @sent="getAccounts" />
 				</PopoverContent>
 			</Popover>
 
-			<div v-if="isListLoading">
-				<Loader />
-			</div>
-
-			<Table v-else class="mt-4">
+			<Table class="mt-4">
 				<TableHeader>
 					<TableRow>
 						<TableHead> Name </TableHead>
@@ -65,7 +61,7 @@ onMounted(() => {
 										</Button>
 									</PopoverTrigger>
 									<PopoverContent class="w-80">
-										<FormsAccount :numericSpaceId :account @sent="updateData" />
+										<FormsAccount :numericSpaceId :account @sent="getAccounts" />
 									</PopoverContent>
 								</Popover>
 
