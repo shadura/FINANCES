@@ -10,6 +10,7 @@ const numericSpaceId = Number(useRoute().params.space)
 const { list: plansList, getList: getPlans, deletePlan } = usePlans()
 const { list: tagsList, getList: getTags } = useTags()
 const { list: accountList, getList: getAccounts } = useAccounts()
+const { getList: getTransactions } = useTransactions()
 
 watch(
 	() => props.period,
@@ -26,6 +27,7 @@ onMounted(() => {
 
 const updateData = () => {
 	getPlans(props.period)
+	getTransactions(props.period)
 }
 </script>
 
