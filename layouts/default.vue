@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Moon, Sun } from 'lucide-vue-next'
 const { getCurrencyRates } = useCurrency()
 await getCurrencyRates()
 
@@ -17,9 +18,6 @@ const toggleTheme = () => {
 				<SidebarTrigger />
 
 				<Switch :model-value="isDark" @update:model-value="toggleTheme">
-					<template #thumb>
-						<Icon v-if="isDark" icon="lucide:moon" class="size-3" />
-						<Icon v-else icon="lucide:sun" class="size-3" />
 					</template>
 				</Switch>
 			</div>
