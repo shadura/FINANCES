@@ -112,11 +112,26 @@ const useTransactions = () => {
 		}
 	})
 
+	const getTransactionsByPlanId = (planId: number) =>
+		computed(() => {
+			return list.value.filter((transaction) => transaction.plan_id === planId)
+		})
+
+	const deleteTransaction = async (id: number) => {
+		if (!confirm('Are you sure you want to delete this transaction?')) return
+
+		await supabase.from('transactions').delete().eq('id', id)
+
+		list.value = list.value.filter((transaction) => transaction.id !== id)
+	}
+
 	return {
 		getList,
 		isListLoading,
 		list,
 		getSum,
+		getTransactionsByPlanId,
+		deleteTransaction,
 	}
 }
 

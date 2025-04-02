@@ -53,7 +53,7 @@ watch(
 			<div>
 				<Card>
 					<CardHeader>
-						<CardTitle>Period summary</CardTitle>
+						<CardTitle>Summary</CardTitle>
 						<CardDescription>Here you can see period summary.</CardDescription>
 					</CardHeader>
 					<CardContent>
@@ -144,11 +144,11 @@ watch(
 					</CardContent>
 				</Card>
 
-				<WidgetsPlan :period class="mt-4" />
+				<WidgetsBudget :period class="mt-4" />
 			</div>
 
 			<div>
-				<WidgetsTransactions :period />
+				<WidgetsAccountsInfo />
 			</div>
 		</div>
 	</div>

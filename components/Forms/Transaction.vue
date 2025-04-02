@@ -260,17 +260,24 @@ const setTransactionData = () => {
 	}
 
 	if (props.plan) {
-		editItem.value.type = ETransactionType.EXPENSE
-		editItem.value.account_from = props.plan.preferred_account || null
-		editItem.value.amount_debit = props.plan.amount
+		editItem.value.plan_id = props.plan.id || null
+
+		if (props.plan.is_income) {
+			editItem.value.type = ETransactionType.INCOME
+			editItem.value.account_to = props.plan.preferred_account || null
+			editItem.value.amount_credit = props.plan.amount
+		} else {
+			editItem.value.type = ETransactionType.EXPENSE
+			editItem.value.account_from = props.plan.preferred_account || null
+			editItem.value.amount_debit = props.plan.amount
+		}
+
 		editItem.value.description = props.plan.description || ''
 
 		selectedTags.value = props.plan.plan_tags.map((tr) => ({
 			id: tr.tags.id,
 			name: tr.tags.name,
 		}))
-
-		editItem.value.plan_id = props.plan?.id || null
 	}
 }
 
