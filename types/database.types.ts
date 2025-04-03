@@ -128,6 +128,7 @@ export type Database = {
           description: string | null
           id: number
           is_income: boolean | null
+          is_marked_done: boolean
           period_month_year: number
           preferred_account: number | null
           space_id: number
@@ -139,6 +140,7 @@ export type Database = {
           description?: string | null
           id?: number
           is_income?: boolean | null
+          is_marked_done?: boolean
           period_month_year: number
           preferred_account?: number | null
           space_id: number
@@ -150,6 +152,7 @@ export type Database = {
           description?: string | null
           id?: number
           is_income?: boolean | null
+          is_marked_done?: boolean
           period_month_year?: number
           preferred_account?: number | null
           space_id?: number

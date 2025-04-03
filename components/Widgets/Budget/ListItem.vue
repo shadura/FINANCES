@@ -15,6 +15,7 @@ const props = defineProps<{
 
 const emit = defineEmits(['sent:transaction', 'delete:transaction', 'sent:plan', 'delete:plan'])
 
+const { markAsDone } = usePlans()
 const { getTransactionsByPlanId } = useTransactions()
 const { convert } = useCurrency()
 
@@ -77,8 +78,6 @@ const handlePlanEdited = () => {
 	emit('sent:plan')
 }
 
-// const handleMarkAsDone = () => {}
-
 const handleDelete = () => {
 	emit('delete:plan', props.plan.id)
 }
@@ -96,12 +95,12 @@ const handleDelete = () => {
 							</Tag>
 						</div>
 
-						<div class="account mt-0.5 flex items-center gap-1 justify-start ml-2.5">
+						<div v-if="plan.id" class="account mt-0.5 flex items-center gap-1 justify-start ml-2.5 mb-2">
 							<CornerDownRight :size="14" />
 							<span>{{ plan.preferred_account_info?.name || '-' }}</span>
 						</div>
 
-						<div v-if="plan.description" class="description mt-2 text-sm text-muted-foreground italic">
+						<div v-if="plan.description" class="description text-sm text-muted-foreground italic">
 							<span v-html="getFormatedDescription(plan.description)" />
 						</div>
 					</div>
@@ -135,11 +134,11 @@ const handleDelete = () => {
 							<Button variant="ghost" size="icon" class="cursor-pointer"><EllipsisVertical /></Button>
 						</DropdownMenuTrigger>
 						<DropdownMenuContent>
-							<DropdownMenuItem @click="handleOpenPlanPopover">Edit</DropdownMenuItem>
+							<DropdownMenuItem v-if="plan.id" @click="handleOpenPlanPopover">Edit</DropdownMenuItem>
 							<DropdownMenuItem @click="isCollapsibleOpen = !isCollapsibleOpen">Toggle transactions</DropdownMenuItem>
-							<!-- <DropdownMenuItem @click="handleMarkAsDone">Mark as done</DropdownMenuItem> -->
-							<DropdownMenuSeparator />
-							<DropdownMenuItem class="text-red-500" @click="handleDelete">Delete</DropdownMenuItem>
+							<DropdownMenuItem v-if="plan.id" @click="markAsDone(plan.id)">Mark as done</DropdownMenuItem>
+							<DropdownMenuSeparator v-if="plan.id" />
+							<DropdownMenuItem v-if="plan.id" class="text-red-500" @click="handleDelete">Delete</DropdownMenuItem>
 						</DropdownMenuContent>
 					</DropdownMenu>
 

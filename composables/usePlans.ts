@@ -63,6 +63,14 @@ const usePlan = () => {
 		list.value = list.value.filter((plan) => plan.id !== id)
 	}
 
+	const markAsDone = async (id: number) => {
+		if (!confirm('Are you sure you want to mark this plan as done?')) return
+
+		await supabase.from('plans').update({ is_marked_done: true }).eq('id', id)
+
+		list.value = list.value.map((plan) => (plan.id === id ? { ...plan, is_marked_done: true } : plan))
+	}
+
 	const getPlannedTags = computed(() => {
 		if (!list.value.length)
 			return {
@@ -163,6 +171,7 @@ const usePlan = () => {
 		list,
 		isListLoading,
 		getPlannedTags,
+		markAsDone,
 	}
 }
 

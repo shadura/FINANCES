@@ -118,7 +118,12 @@ const useTransactions = () => {
 
 	const getTransactionsByPlanId = (planId: number) =>
 		computed(() => {
-			return list.value.filter((transaction) => transaction.plan_id === planId)
+			return list.value.filter((transaction) => {
+				if (planId === 0) {
+					return !transaction.plan_id
+				}
+				return transaction.plan_id === planId
+			})
 		})
 
 	const deleteTransaction = async (id: number) => {
