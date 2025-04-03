@@ -89,7 +89,11 @@ const useTransactions = () => {
 			}
 
 		const primary = list.value.reduce((acc, transaction) => {
-			if (transaction.amount_debit !== null && transaction.account_from_info?.currency) {
+			if (
+				transaction.amount_debit !== null &&
+				transaction.account_from_info?.currency &&
+				transaction.type !== ETransactionType.TRANSFER
+			) {
 				return (
 					acc + convert(transaction.amount_debit, transaction.account_from_info.currency as ECurrency, PRIMARY_CURRENCY)
 				)

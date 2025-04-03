@@ -49,7 +49,7 @@ const updateData = (type?: 'plan' | 'transaction') => {
 						<Button>Add plan</Button>
 					</PopoverTrigger>
 					<PopoverContent class="w-140">
-						<FormsPlan :tagsList :accountList :numericSpaceId :period="props.period" @sent="updateData" />
+						<FormsPlan :tagsList :accountList :numericSpaceId :period="props.period" @sent="updateData('plan')" />
 					</PopoverContent>
 				</Popover>
 
@@ -63,7 +63,7 @@ const updateData = (type?: 'plan' | 'transaction') => {
 							:tagsList="tagsList"
 							:numericSpaceId="numericSpaceId"
 							:period="props.period"
-							@sent="updateData"
+							@sent="updateData('transaction')"
 						/>
 					</PopoverContent>
 				</Popover>
