@@ -27,6 +27,21 @@ watch(
 	},
 	{ immediate: true },
 )
+
+const getSaveRate = computed(() => {
+	const saveTag = getPlannedTags.value.expense.list.find((tag) => tag.tag.name === 'SAVE')
+	const saveAmount = saveTag ? saveTag.amount : 0
+
+	const incomeAmount = getPlannedTags.value.income.amount
+	const expenseAmount = getPlannedTags.value.expense.amount
+
+	const rate = Math.round((saveAmount / (incomeAmount || expenseAmount)) * 100 * 100) / 100
+
+	return {
+		rate: `${rate}%`,
+		amount: saveAmount,
+	}
+})
 </script>
 
 <template>
@@ -138,6 +153,16 @@ watch(
 											SECONDARY_CURRENCY,
 										)
 									}}
+								</div>
+							</div>
+
+							<div>
+								<div class="mb-1 text-sm text-muted-foreground">Save rate</div>
+								<div class="font-bold text-lg">
+									{{ getSaveRate.rate }}
+								</div>
+								<div class="text-xs">
+									{{ useFormatAmount(getSaveRate.amount, PRIMARY_CURRENCY) }}
 								</div>
 							</div>
 						</div>

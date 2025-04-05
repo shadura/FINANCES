@@ -40,8 +40,8 @@ const updateData = (type?: 'plan' | 'transaction') => {
 <template>
 	<Card>
 		<CardHeader class="p-4 md:p-6">
-			<CardTitle>Plan</CardTitle>
-			<CardDescription>Manage your budget plans here.</CardDescription>
+			<CardTitle>Plan/Transaction</CardTitle>
+			<CardDescription>Manage your plans and transactions here.</CardDescription>
 		</CardHeader>
 		<CardContent class="p-4 md:p-6">
 			<div class="flex gap-2 items-center justify-start">
@@ -70,13 +70,14 @@ const updateData = (type?: 'plan' | 'transaction') => {
 				</Popover>
 			</div>
 
-			<Tabs default-value="list" class="w-full mt-6">
+			<Tabs default-value="plan" class="w-full mt-6">
 				<TabsList>
-					<TabsTrigger value="list"> List </TabsTrigger>
-					<TabsTrigger value="tags"> By Tags </TabsTrigger>
-					<TabsTrigger value="accounts"> By Accounts </TabsTrigger>
+					<TabsTrigger value="plan"> Plan </TabsTrigger>
+					<TabsTrigger value="tags"> Tags </TabsTrigger>
+					<TabsTrigger value="accounts"> Accounts </TabsTrigger>
+					<TabsTrigger value="transactions"> Transactions </TabsTrigger>
 				</TabsList>
-				<TabsContent value="list">
+				<TabsContent value="plan">
 					<WidgetsBudgetList
 						:list="plansList"
 						:tagsList="tagsList"
@@ -95,6 +96,17 @@ const updateData = (type?: 'plan' | 'transaction') => {
 				</TabsContent>
 				<TabsContent value="accounts">
 					<WidgetsBudgetAccounts />
+				</TabsContent>
+				<TabsContent value="transactions">
+					<WidgetsBudgetTransactions
+						:accountList="accountList"
+						:tagsList="tagsList"
+						:numericSpaceId="numericSpaceId"
+						:period="props.period"
+						class="mt-4"
+						@sent="updateData('transaction')"
+						@delete="(id: number) => deleteTransaction(id)"
+					/>
 				</TabsContent>
 			</Tabs>
 		</CardContent>

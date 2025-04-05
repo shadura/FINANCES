@@ -4,6 +4,7 @@ import type { Account, Tag, TransactionWithTags } from '~/types/index.types'
 import dayjs from 'dayjs'
 import { ETransactionType } from '~/types/enums/transaction'
 import type { ECurrency } from '~/types/enums/currency'
+import getFormatedDescription from '@/utils/getFormatedDescription'
 
 const props = defineProps<{
 	transaction: TransactionWithTags
@@ -127,9 +128,11 @@ const updateData = () => {
 					<CornerDownRight :size="14" />
 					<span>{{ getFormattedAccount }}</span>
 				</div>
-				<div v-if="props.transaction.description" class="mt-2 text-sm text-muted-foreground italic">
-					{{ props.transaction.description }}
-				</div>
+				<div
+					v-if="props.transaction.description"
+					class="mt-2 text-sm text-muted-foreground italic"
+					v-html="getFormatedDescription(props.transaction.description)"
+				></div>
 			</div>
 		</div>
 
