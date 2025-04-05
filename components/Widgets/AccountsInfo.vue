@@ -13,11 +13,11 @@ const splitedAccounts = computed(() => {
 
 <template>
 	<Card>
-		<CardHeader>
+		<CardHeader class="p-4 md:p-6">
 			<CardTitle>Accounts</CardTitle>
 			<CardDescription>Here you can see your accounts amounts.</CardDescription>
 		</CardHeader>
-		<CardContent>
+		<CardContent class="p-4 md:p-6">
 			<div v-if="isListLoading">
 				<Loader />
 			</div>

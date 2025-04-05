@@ -32,17 +32,18 @@ const updateData = (type?: 'plan' | 'transaction') => {
 
 	if (!type || type === 'transaction') {
 		getTransactions(props.period)
+		getAccounts()
 	}
 }
 </script>
 
 <template>
 	<Card>
-		<CardHeader>
+		<CardHeader class="p-4 md:p-6">
 			<CardTitle>Plan</CardTitle>
 			<CardDescription>Manage your budget plans here.</CardDescription>
 		</CardHeader>
-		<CardContent>
+		<CardContent class="p-4 md:p-6">
 			<div class="flex gap-2 items-center justify-start">
 				<Popover>
 					<PopoverTrigger as-child>

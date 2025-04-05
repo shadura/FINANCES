@@ -49,15 +49,15 @@ watch(
 			</Select>
 		</div>
 
-		<div class="grid grid-cols-2 gap-4 mt-8" style="grid-template-columns: 2fr 1fr">
+		<div class="mt-6 grid grid-cols-1 gap-4 md:grid-cols-[2fr_1fr]">
 			<div>
 				<Card>
-					<CardHeader>
+					<CardHeader class="p-4 md:p-6">
 						<CardTitle>Summary</CardTitle>
 						<CardDescription>Here you can see period summary.</CardDescription>
 					</CardHeader>
-					<CardContent>
-						<div class="grid grid-cols-5 items-center gap-8">
+					<CardContent class="p-4 md:p-6">
+						<div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 items-center gap-8">
 							<div>
 								<div class="mb-1 text-sm text-muted-foreground">Planned Income</div>
 								<div class="font-bold text-lg">

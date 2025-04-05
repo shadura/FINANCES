@@ -84,7 +84,7 @@ const handleDelete = () => {
 </script>
 
 <template>
-	<div class="border rounded-md p-4">
+	<div class="border rounded-md p-3 md:p-4">
 		<Collapsible v-model:open="isCollapsibleOpen">
 			<div class="flex items-center justify-between">
 				<div class="left flex gap-2 justify-start items-center">

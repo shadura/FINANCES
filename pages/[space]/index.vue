@@ -10,7 +10,7 @@ onMounted(() => {
 	<div>
 		<h1 class="text-2xl font-bold">Dashboard</h1>
 
-		<div class="mt-6 grid grid-cols-2 gap-4" style="grid-template-columns: 1fr 2fr">
+		<div class="mt-6 grid grid-cols-1 gap-4 md:grid-cols-[1fr_2fr]">
 			<div>
 				<WidgetsNetWorthPie :data="getNetWorhInfo" />
 

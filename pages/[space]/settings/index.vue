@@ -9,16 +9,16 @@ const space = await getSpace(Number(spaceId))
 	<div>
 		<h1 class="text-2xl font-bold">Settings</h1>
 
-		<div class="grid grid-cols-2 gap-4 mt-8" style="grid-template-columns: 2fr 1fr">
+		<div class="mt-6 grid grid-cols-1 gap-4 md:grid-cols-[2fr_1fr]">
 			<div>
 				<WidgetsAccounts />
 			</div>
 			<div>
 				<Card>
-					<CardHeader>
+					<CardHeader class="p-4 md:p-6">
 						<CardTitle>Space members</CardTitle>
 					</CardHeader>
-					<CardContent>
+					<CardContent class="p-4 md:p-6">
 						<ul>
 							<li v-for="member in space.members" :key="member.user_id">{{ member.name }}</li>
 						</ul>

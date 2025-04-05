@@ -31,6 +31,17 @@ export default defineNuxtConfig({
 	app: {
 		head: {
 			title: 'Finance',
+			charset: 'utf-8',
+			viewport: 'width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1',
+			meta: [
+				{ charset: 'utf-8' },
+				{
+					name: 'viewport',
+					content: 'width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1',
+				},
+				{ name: 'apple-mobile-web-app-capable', content: 'yes' },
+				{ name: 'mobile-web-app-capable', content: 'yes' },
+			],
 		},
 	},
 

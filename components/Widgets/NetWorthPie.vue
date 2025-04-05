@@ -150,11 +150,11 @@ watch(
 
 <template>
 	<Card>
-		<CardHeader>
+		<CardHeader class="p-4 md:p-6">
 			<CardTitle>Net worth</CardTitle>
 			<CardDescription>Here you can see your current net worth.</CardDescription>
 		</CardHeader>
-		<CardContent>
+		<CardContent class="p-4 md:p-6">
 			<div class="">
 				<Tabs v-model="tab" class="w-full" @change="init">
 					<TabsList>

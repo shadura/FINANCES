@@ -22,11 +22,11 @@ onMounted(() => {
 
 <template>
 	<Card>
-		<CardHeader>
+		<CardHeader class="p-4 md:p-6">
 			<CardTitle>Accounts list</CardTitle>
 			<CardDescription>Manage your accounts here.</CardDescription>
 		</CardHeader>
-		<CardContent>
+		<CardContent class="p-4 md:p-6">
 			<Popover>
 				<PopoverTrigger as-child>
 					<Button>Add account</Button>
