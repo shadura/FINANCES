@@ -1,5 +1,8 @@
 <script setup lang="ts">
+import dayjs from 'dayjs'
 import { CalendarSync, Wallet, Settings, ChevronUp, ChartCandlestick, Focus, User2 } from 'lucide-vue-next'
+
+const runtimeConfig = useRuntimeConfig()
 
 const space = computed(() => Number(useRoute().params.space))
 
@@ -93,6 +96,10 @@ const signOut = async () => {
 			</SidebarGroup>
 		</SidebarContent>
 		<SidebarFooter v-if="user?.user_metadata">
+			<div v-if="runtimeConfig.public.BUILD_TIME" class="text-xs text-muted-foreground text-center">
+				Last build:<br />
+				{{ dayjs(runtimeConfig.public.BUILD_TIME).format('DD MMM YYYY HH:mm') }}
+			</div>
 			<SidebarMenu>
 				<SidebarMenuItem>
 					<DropdownMenu>

@@ -12,7 +12,7 @@ export default defineNuxtConfig({
 	},
 
 	pwa: {
-		strategies: 'injectManifest',
+		strategies: 'generateSW',
 		registerType: 'autoUpdate',
 		manifest: {
 			name: 'Finance',
@@ -181,12 +181,6 @@ export default defineNuxtConfig({
 				},
 			],
 		},
-		workbox: {
-			globPatterns: ['**/*.{js,css,html,png,svg,ico}'],
-		},
-		injectManifest: {
-			globPatterns: ['**/*.{js,css,html,png,svg,ico}'],
-		},
 		client: {
 			installPrompt: true,
 			// you don't need to include this: only for testing purposes
@@ -234,6 +228,12 @@ export default defineNuxtConfig({
 				{ name: 'mobile-web-app-capable', content: 'yes' },
 				{ name: 'theme-color', content: '#ffffff' },
 			],
+		},
+	},
+
+	runtimeConfig: {
+		public: {
+			BUILD_TIME: new Date().toISOString(),
 		},
 	},
 
