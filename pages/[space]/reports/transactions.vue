@@ -4,6 +4,7 @@ import { useFilter } from 'reka-ui'
 import { PRIMARY_CURRENCY, SECONDARY_CURRENCY } from '~/const/currency.const'
 import type { DB, Tag } from '@/types/index.types'
 import type { ECurrency } from '@/types/enums/currency'
+import { ETransactionType } from '@/types/enums/transaction'
 import getFormatedDescription from '@/utils/getFormatedDescription'
 
 type TransactionReportItem = DB<'transactions'> & {
@@ -179,6 +180,10 @@ watch(
 								class="cursor-pointer mr-1"
 								@click="handleTagClick(tag.tags)"
 								>{{ tag.tags.name }}</Tag
+							>
+
+							<Tag v-if="item.type === ETransactionType.LEGACY" class="cursor-default" variant="outline" disabled
+								>Legacy</Tag
 							>
 
 							<span class="inline-block ml-2" v-html="getFormatedDescription(item.description)" />

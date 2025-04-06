@@ -3,6 +3,7 @@ export enum ETransactionType {
 	EXPENSE = 'expense',
 	TRANSFER = 'transfer',
 	ADJUST = 'adjust',
+	LEGACY = 'legacy',
 }
 
 export const transactionTypeArray: string[] = Object.values(ETransactionType)

@@ -27,7 +27,10 @@ const getFormattedAccount = computed(() => {
 		return `${props.transaction.account_from_info.name} → ${props.transaction.account_to_info.name}`
 	}
 
-	if (props.transaction.type === ETransactionType.EXPENSE && props.transaction.account_from_info) {
+	if (
+		(props.transaction.type === ETransactionType.EXPENSE || props.transaction.type === ETransactionType.LEGACY) &&
+		props.transaction.account_from_info
+	) {
 		return props.transaction.account_from_info.name
 	}
 
@@ -43,7 +46,7 @@ const getFormattedAmount = computed(() => {
 		return useFormatAmount(props.transaction.amount_credit, props.transaction.account_to_info?.currency as ECurrency)
 	}
 
-	if (props.transaction.type === ETransactionType.EXPENSE) {
+	if (props.transaction.type === ETransactionType.EXPENSE || props.transaction.type === ETransactionType.LEGACY) {
 		return useFormatAmount(props.transaction.amount_debit, props.transaction.account_from_info?.currency as ECurrency)
 	}
 
@@ -87,6 +90,13 @@ const getTypeTag = computed(() => {
 		return {
 			name: 'Adjust',
 			color: 'orange',
+		}
+	}
+
+	if (props.transaction.type === ETransactionType.LEGACY) {
+		return {
+			name: 'Legacy',
+			color: 'gray',
 		}
 	}
 

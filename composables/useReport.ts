@@ -50,7 +50,7 @@ const useReport = () => {
       `,
 			)
 			.eq('space_id', numericSpaceId.value)
-			.eq('type', 'expense')
+			.in('type', ['expense', 'legacy'])
 			.gte('date', fromDate)
 			.lte('date', adjustedToDate)
 
@@ -70,7 +70,7 @@ const useReport = () => {
 
 		const { convert } = useCurrency()
 		const sum = filteredList.reduce((acc, item) => {
-			if (item.type !== 'expense' || !item.account_from_info?.currency) return acc
+			if (!['expense', 'legacy'].includes(item.type) || !item.account_from_info?.currency) return acc
 
 			const amount = convert(item.amount_debit || 0, item.account_from_info.currency as ECurrency, PRIMARY_CURRENCY)
 

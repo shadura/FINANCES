@@ -10,7 +10,6 @@ const props = defineProps<{
 	accountList: null | Account[]
 	tagsList: null | Tag[]
 	transaction?: TransactionWithTags
-
 	plan?: PlanWithTags
 }>()
 
@@ -38,6 +37,15 @@ const clearTransaction: TransactionForm = {
 
 const supabase = useSupabase()
 
+const isHistoryTransaction = ref(false)
+
+const transactionTypes = computed(() => {
+	if (props.plan?.id || props.transaction?.type === ETransactionType.LEGACY)
+		return transactionTypeArray.filter((type) => type !== ETransactionType.LEGACY)
+
+	return transactionTypeArray
+})
+
 const editItem = ref<TransactionForm>({ ...clearTransaction })
 
 const isDisabled = computed(
@@ -60,9 +68,13 @@ const getAccountToCurrency = computed(() => {
 	return account?.currency || '-'
 })
 
-const isShowFrom = computed(() => [ETransactionType.EXPENSE, ETransactionType.TRANSFER].includes(editItem.value.type))
-const isShowTo = computed(() =>
-	[ETransactionType.INCOME, ETransactionType.TRANSFER, ETransactionType.ADJUST].includes(editItem.value.type),
+const isShowFrom = computed(() =>
+	[ETransactionType.EXPENSE, ETransactionType.TRANSFER, ETransactionType.LEGACY].includes(editItem.value.type),
+)
+const isShowTo = computed(
+	() =>
+		[ETransactionType.INCOME, ETransactionType.TRANSFER, ETransactionType.ADJUST].includes(editItem.value.type) &&
+		!isHistoryTransaction.value,
 )
 
 const isShowTags = computed(() => {
@@ -326,18 +338,34 @@ const handleSubmitForm = async () => {
 			</div>
 			<div>
 				<div class="mb-2">
-					<Select v-model="editItem.type" @update:model-value="handleUpdateType">
+					<Select
+						v-model="editItem.type"
+						:disabled="props.transaction?.type === ETransactionType.LEGACY"
+						@update:model-value="handleUpdateType"
+					>
 						<SelectTrigger>
 							<SelectValue placeholder="Type" />
 						</SelectTrigger>
 						<SelectContent>
 							<SelectGroup>
-								<SelectItem v-for="type in transactionTypeArray" :value="type" :key="type">
+								<SelectItem v-for="type in transactionTypes" :value="type" :key="type">
 									{{ type }}
+								</SelectItem>
+
+								<SelectItem
+									v-if="props.transaction?.type === ETransactionType.LEGACY"
+									:value="ETransactionType.LEGACY"
+									:key="ETransactionType.LEGACY"
+								>
+									{{ ETransactionType.LEGACY }}
 								</SelectItem>
 							</SelectGroup>
 						</SelectContent>
 					</Select>
+
+					<p v-if="editItem.type === ETransactionType.LEGACY" class="text-sm text-muted-foreground mt-1 text-center">
+						This transaction will be added <br />but will not affect account balance.
+					</p>
 				</div>
 
 				<div v-if="isShowFrom" class="mb-2">
@@ -439,7 +467,7 @@ const handleSubmitForm = async () => {
 					</Combobox>
 				</div>
 
-				<div class="mb-2">
+				<div class="mb-4">
 					<Input v-model="editItem.description" type="text" placeholder="Description" />
 				</div>
 
