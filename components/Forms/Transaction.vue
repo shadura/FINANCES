@@ -226,7 +226,7 @@ const createTransaction = async () => {
 			await createTagsRelationship(transaction_id, selectedTags.value)
 		}
 
-		editItem.value = { ...clearTransaction }
+		editItem.value = { ...clearTransaction, date: editItem.value.date }
 		selectedTags.value = []
 	} catch (err) {
 		console.error('error:', err)
