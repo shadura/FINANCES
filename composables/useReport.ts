@@ -1,13 +1,7 @@
 import { PRIMARY_CURRENCY } from '~/const/currency.const'
-import type { DB } from '@/types/index.types'
+import type { DB, TransactionWithTags } from '@/types/index.types'
 import type { ECurrency } from '@/types/enums/currency'
 import dayjs from 'dayjs'
-
-type TransactionReportItem = DB<'transactions'> & {
-	transaction_tags: { id: number; tags: { id: number; name: string; color: string } }[]
-	account_from_info: DB<'accounts'> | null
-	account_to_info: DB<'accounts'> | null
-}
 
 const useReport = () => {
 	const supabase = useSupabase()
@@ -59,7 +53,7 @@ const useReport = () => {
 			throw error
 		}
 
-		const typedData = data as unknown as TransactionReportItem[]
+		const typedData = data as unknown as TransactionWithTags[]
 
 		const filteredList = tags?.length
 			? typedData.filter((transaction) => {

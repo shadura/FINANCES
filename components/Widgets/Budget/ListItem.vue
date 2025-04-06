@@ -84,12 +84,12 @@ const handleDelete = () => {
 </script>
 
 <template>
-	<div class="border rounded-md p-3 md:p-4">
+	<div class="border rounded-md pl-3 pr-0 py-3">
 		<Collapsible v-model:open="isCollapsibleOpen">
 			<div class="flex items-center justify-between">
 				<div class="left flex gap-2 justify-start items-center">
 					<div class="info">
-						<div class="flex gap-2 justify-start items-center">
+						<div class="flex gap-2 justify-start items-center flex-wrap">
 							<Tag v-for="tag in plan.plan_tags" :key="tag.tags.id" :color="tag.tags.color">
 								{{ tag.tags.name }}
 							</Tag>
@@ -107,7 +107,7 @@ const handleDelete = () => {
 				</div>
 
 				<div class="right flex items-center justify-end gap-1">
-					<div class="text-right">
+					<div class="text-right whitespace-nowrap">
 						<div>{{ useFormatAmount(plan.amount, plan.currency as ECurrency) }}</div>
 
 						<div>{{ useFormatAmount(getTransactionsSum, plan.currency as ECurrency) }}</div>

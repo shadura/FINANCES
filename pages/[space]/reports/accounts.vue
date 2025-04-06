@@ -55,7 +55,7 @@ onMounted(() => {
 	<div>
 		<h1 class="text-2xl font-bold">Accounts report</h1>
 
-		<div class="mt-4 flex gap-2 justify-start">
+		<div class="mt-4 flex gap-2 justify-start flex-wrap">
 			<div>
 				<Select v-model="form.period">
 					<SelectTrigger class="col-span-2 w-[100px]">

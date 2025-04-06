@@ -2,16 +2,7 @@
 import dayjs from 'dayjs'
 import { useFilter } from 'reka-ui'
 import { PRIMARY_CURRENCY, SECONDARY_CURRENCY } from '~/const/currency.const'
-import type { DB, Tag } from '@/types/index.types'
-import type { ECurrency } from '@/types/enums/currency'
-import { ETransactionType } from '@/types/enums/transaction'
-import getFormatedDescription from '@/utils/getFormatedDescription'
-
-type TransactionReportItem = DB<'transactions'> & {
-	transaction_tags: { id: number; tags: { id: number; name: string; color: string } }[]
-	account_from_info: DB<'accounts'> | null
-	account_to_info: DB<'accounts'> | null
-}
+import type { Tag, TransactionWithTags } from '@/types/index.types'
 
 const { getList: getTags, list: tags } = useTags()
 const { getTransactionsReport, isReportLoading } = useReport()
@@ -24,7 +15,7 @@ const form = ref({
 	toDate: now.endOf('month').format('YYYY-MM-DD'),
 })
 
-const result = ref<{ sum: number; list: TransactionReportItem[] }>({ sum: 0, list: [] })
+const result = ref<{ sum: number; list: TransactionWithTags[] }>({ sum: 0, list: [] })
 const getResult = async () => {
 	if (!form.value.fromDate || !form.value.toDate) return
 
@@ -84,13 +75,36 @@ watch(
 	},
 	{ deep: true, immediate: true },
 )
+
+interface ISlitedListItem {
+	year: string
+	list: TransactionWithTags[]
+}
+
+const splitedList = computed(() => {
+	if (!result.value.list.length) return []
+
+	return result.value.list
+		.reduce((acc, item): ISlitedListItem[] => {
+			const year = dayjs(item.date).format('YYYY')
+			const itemIndex = acc.findIndex((i) => i.year === year)
+
+			if (itemIndex === -1) {
+				return [...acc, { year, list: [item] }]
+			} else {
+				acc[itemIndex].list.push(item)
+				return acc
+			}
+		}, [] as ISlitedListItem[])
+		.sort((a, b) => dayjs(b.year).diff(dayjs(a.year)))
+})
 </script>
 
 <template>
 	<div>
 		<h1 class="text-2xl font-bold">Transactions report</h1>
 
-		<div class="mt-4 flex gap-2 justify-start">
+		<div class="mt-4 flex gap-2 justify-start flex-wrap">
 			<div>
 				<Input
 					id="name"
@@ -164,35 +178,18 @@ watch(
 					<Loader />
 				</div>
 
-				<ul v-else>
-					<li
-						v-for="item in result.list"
-						:key="item.id"
-						class="flex justify-between border-b last:border-b-0 mb-2 pb-2"
-					>
-						<div>
-							<span class="inline-block mr-2 w-16">{{ dayjs(item.date).format('DD MMM') }}</span>
-
-							<Tag
-								v-for="tag in item.transaction_tags"
-								:key="tag.id"
-								:color="tag.tags.color"
-								class="cursor-pointer mr-1"
-								@click="handleTagClick(tag.tags)"
-								>{{ tag.tags.name }}</Tag
-							>
-
-							<Tag v-if="item.type === ETransactionType.LEGACY" class="cursor-default" variant="outline" disabled
-								>Legacy</Tag
-							>
-
-							<span class="inline-block ml-2" v-html="getFormatedDescription(item.description)" />
-						</div>
-						<div class="text-right">
-							<span>{{ useFormatAmount(item.amount_debit, item.account_from_info?.currency as ECurrency) }}</span>
-						</div>
-					</li>
-				</ul>
+				<div v-else>
+					<div v-for="item in splitedList" :key="item.year">
+						<Separator :label="item.year" class="mt-10 mb-6" />
+						<WidgetsTransaction
+							v-for="transaction in item.list"
+							:key="transaction.id"
+							:transaction
+							showTags
+							hideOptions
+						/>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>

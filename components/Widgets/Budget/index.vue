@@ -104,6 +104,7 @@ const updateData = (type?: 'plan' | 'transaction') => {
 						:numericSpaceId="numericSpaceId"
 						:period="props.period"
 						class="mt-4"
+						showTags
 						@sent="updateData('transaction')"
 						@delete="(id: number) => deleteTransaction(id)"
 					/>

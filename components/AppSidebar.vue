@@ -1,14 +1,5 @@
 <script setup lang="ts">
-import {
-	CalendarSync,
-	Wallet,
-	Settings,
-	ChevronUp,
-	ChartCandlestick,
-	Focus,
-	User2,
-	ArrowLeftRight,
-} from 'lucide-vue-next'
+import { CalendarSync, Wallet, Settings, ChevronUp, ChartCandlestick, Focus, User2 } from 'lucide-vue-next'
 
 const space = computed(() => Number(useRoute().params.space))
 
@@ -25,10 +16,9 @@ const items = computed(() => [
 		icon: Wallet,
 	},
 	{
-		title: 'Subscriptions',
-		url: `/${space.value}/subscriptions`,
+		title: 'Transactions',
+		url: `/${space.value}/transactions`,
 		icon: CalendarSync,
-		soon: true,
 	},
 	{
 		title: 'Reports',
@@ -78,13 +68,11 @@ const signOut = async () => {
 								<nuxt-link v-if="item.url" :to="item.url">
 									<component :is="item.icon" />
 									<span>{{ item.title }}</span>
-									<span v-if="item.soon" class="text-xs text-gray-500 bg-gray-200 rounded-lg px-1 py-0.5">soon</span>
 								</nuxt-link>
 
 								<span v-else>
 									<component :is="item.icon" />
 									<span>{{ item.title }}</span>
-									<span v-if="item.soon" class="text-xs text-gray-500 bg-gray-200 rounded-lg px-1 py-0.5">soon</span>
 								</span>
 
 								<template v-if="item.subItems">

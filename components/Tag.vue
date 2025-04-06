@@ -34,7 +34,7 @@ const textColor = computed(() => {
 <template>
 	<Badge
 		variant="secondary"
-		class="py-1"
+		class="py-1 whitespace-nowrap"
 		:style="{ backgroundColor: props.color && props.color !== 'default' ? props.color : '', color: textColor }"
 	>
 		<slot />

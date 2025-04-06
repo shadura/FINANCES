@@ -19,7 +19,7 @@ const toggleTheme = () => {
 				<Switch :model-value="isDark" @update:model-value="toggleTheme"> </Switch>
 			</div>
 
-			<div class="pt-6 px-3 sm:px-6 lg:px-8 w-full pb-6"><slot /></div>
+			<div class="pt-6 px-3 sm:px-6 lg:px-8 w-full pb-24"><slot /></div>
 		</main>
 	</SidebarProvider>
 </template>

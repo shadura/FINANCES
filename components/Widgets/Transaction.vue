@@ -8,9 +8,11 @@ import getFormatedDescription from '@/utils/getFormatedDescription'
 
 const props = defineProps<{
 	transaction: TransactionWithTags
-	tagsList: Tag[]
-	accountList: Account[]
-	numericSpaceId: number
+	tagsList?: Tag[]
+	accountList?: Account[]
+	numericSpaceId?: number
+	showTags?: boolean
+	hideOptions?: boolean
 }>()
 
 const emit = defineEmits(['delete', 'sent'])
@@ -126,11 +128,17 @@ const updateData = () => {
 </script>
 
 <template>
-	<div class="rounded-md border px-4 py-3 font-mono text-sm flex justify-between items-center mt-2">
+	<div class="rounded-md border pl-3 pr-0 py-3 font-mono text-sm justify-between items-center mt-2 grid grid-cols-2">
 		<div class="left">
-			<div class="top flex justify-start items-center gap-2">
+			<div class="top flex justify-start items-center gap-2 flex-wrap">
 				<Tag>{{ dayjs(transaction.date).format('DD MMM') }}</Tag>
 				<Tag v-if="getTypeTag" :color="getTypeTag.color">{{ getTypeTag.name }}</Tag>
+
+				<template v-if="showTags">
+					<Tag v-for="tag in transaction.transaction_tags" :key="tag.tags.id" :color="tag.tags.color">
+						{{ tag.tags.name }}
+					</Tag>
+				</template>
 			</div>
 
 			<div class="info">
@@ -149,7 +157,7 @@ const updateData = () => {
 		<div class="right flex items-center justify-end gap-2">
 			<div class="amount">{{ getFormattedAmount }}</div>
 
-			<DropdownMenu>
+			<DropdownMenu v-if="!hideOptions">
 				<DropdownMenuTrigger>
 					<Button variant="ghost" size="icon" class="cursor-pointer"><EllipsisVertical /></Button>
 				</DropdownMenuTrigger>
@@ -163,7 +171,13 @@ const updateData = () => {
 			<Popover :open="openEdit" @update:open="handleIpdatePlanPopover">
 				<PopoverTrigger as-child> <div></div></PopoverTrigger>
 				<PopoverContent class="w-140">
-					<FormsTransaction :transaction :accountList :tagsList :numericSpaceId @sent="updateData" />
+					<FormsTransaction
+						:transaction
+						:accountList="accountList || []"
+						:tagsList="tagsList || []"
+						:numericSpaceId="numericSpaceId || 0"
+						@sent="updateData"
+					/>
 				</PopoverContent>
 			</Popover>
 		</div>
