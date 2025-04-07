@@ -86,7 +86,7 @@ const handleDelete = () => {
 <template>
 	<div class="border rounded-md pl-3 pr-0 py-3">
 		<Collapsible v-model:open="isCollapsibleOpen">
-			<div class="flex items-center justify-between">
+			<div class="flex items-center justify-between" @click="isCollapsibleOpen = !isCollapsibleOpen">
 				<div class="left flex gap-2 justify-start items-center">
 					<div class="info">
 						<div class="flex gap-2 justify-start items-center flex-wrap">
@@ -106,11 +106,17 @@ const handleDelete = () => {
 					</div>
 				</div>
 
-				<div class="right flex items-center justify-end gap-1">
+				<div class="right flex items-center justify-end gap-1" @click.stop>
 					<div class="text-right whitespace-nowrap">
 						<div>{{ useFormatAmount(plan.amount, plan.currency as ECurrency) }}</div>
 
-						<div>{{ useFormatAmount(getTransactionsSum, plan.currency as ECurrency) }}</div>
+						<div
+							:class="{
+								'text-destructive': getTransactionsSum > plan.amount && props.plan?.id,
+							}"
+						>
+							{{ useFormatAmount(getTransactionsSum, plan.currency as ECurrency) }}
+						</div>
 					</div>
 
 					<Popover>
