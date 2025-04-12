@@ -2,11 +2,17 @@ import type { Database } from './database.types'
 
 export type DB<Table extends keyof Database['public']['Tables']> = Database['public']['Tables'][Table]['Row']
 
+export type DBInsert<Table extends keyof Database['public']['Tables']> = Database['public']['Tables'][Table]['Insert']
+
+export type DBUpdate<Table extends keyof Database['public']['Tables']> = Database['public']['Tables'][Table]['Update']
+
 export type Transaction = DB<'transactions'>
 export type Account = DB<'accounts'>
 export type Tag = DB<'tags'>
 export type TransactionTags = DB<'transaction_tags'>
 export type Plan = DB<'plans'>
+export type PlanInsert = DBInsert<'plans'>
+
 export type PlanTags = DB<'plan_tags'>
 
 export type TransactionWithTags = Transaction & {

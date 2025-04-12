@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import type { Tag, PlanWithTags, Account } from '@/types/index.types'
+import type { Tag, PlanWithTags, Account, PlanInsert } from '@/types/index.types'
 import { ECurrency } from '@/types/enums/currency'
 
 import { PRIMARY_CURRENCY } from '@/const/currency.const'
@@ -165,9 +165,83 @@ const usePlan = () => {
 		}
 	})
 
+	const copyPlans = async (period: string) => {
+		try {
+			const { data, error } = await supabase
+				.from('plans')
+				.select(
+					`
+        *,
+        plan_tags (
+          id,
+          tags (
+            id,
+            name,
+            color
+          )
+        )
+      `,
+				)
+				.eq('period_month_year', Number(dayjs(period, 'YYYY-MM-DD').format('MMYYYY')))
+				.eq('space_id', numericSpaceId.value)
+				.order('created_at', { ascending: false })
+				.limit(1000)
+
+			if (error) throw error
+
+			const plans = data as unknown as PlanWithTags[]
+
+			interface IPlanInsert extends PlanInsert {
+				tags?: number[]
+			}
+			const newPlans: IPlanInsert[] = plans.map((plan) => ({
+				amount: plan.amount || 0,
+				currency: plan.currency || '',
+				description: plan.description || '',
+				space_id: plan.space_id,
+				period_month_year: Number(dayjs(period, 'YYYY-MM-DD').add(1, 'month').format('MMYYYY')),
+				is_income: plan.is_income,
+				preferred_account: plan.preferred_account,
+				is_marked_done: false,
+				tags: plan.plan_tags.map((tag) => tag.tags.id),
+			}))
+
+			for (const plan of newPlans) {
+				const planWithoutTags = { ...plan }
+				delete planWithoutTags.tags
+
+				const { data, error } = await supabase.from('plans').insert(planWithoutTags).select('id').single()
+
+				if (error) {
+					console.error('Error inserting plan:', error)
+					continue
+				}
+
+				if (plan.tags && plan.tags.length > 0) {
+					const planTags = plan.tags.map((tagId) => ({
+						plan_id: data.id,
+						tag_id: tagId,
+						space_id: numericSpaceId.value,
+					}))
+
+					const { error: tagError } = await supabase.from('plan_tags').insert(planTags)
+
+					if (tagError) {
+						console.error('Error inserting plan tags:', tagError)
+					}
+				}
+			}
+
+			console.log('newPlans', newPlans)
+		} catch (err) {
+			console.error('error:', err)
+		}
+	}
+
 	return {
 		getList,
 		deletePlan,
+		copyPlans,
 		list,
 		isListLoading,
 		getPlannedTags,

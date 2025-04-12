@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import dayjs from 'dayjs'
+
 interface IPlanListProps {
 	period: string
 }
@@ -7,7 +9,7 @@ const props = defineProps<IPlanListProps>()
 
 const numericSpaceId = Number(useRoute().params.space)
 
-const { list: plansList, getList: getPlans, deletePlan } = usePlans()
+const { list: plansList, getList: getPlans, deletePlan, copyPlans } = usePlans()
 const { list: tagsList, getList: getTags } = useTags()
 const { list: accountList, getList: getAccounts } = useAccounts()
 const { getList: getTransactions, deleteTransaction } = useTransactions()
@@ -34,6 +36,19 @@ const updateData = (type?: 'plan' | 'transaction') => {
 		getTransactions(props.period)
 		getAccounts()
 	}
+}
+
+const isCopyingPlan = ref(false)
+const copyPlanFromPreviousPeriod = async () => {
+	if (isCopyingPlan.value) return
+
+	isCopyingPlan.value = true
+
+	await copyPlans(dayjs(props.period, 'YYYY-MM-DD').subtract(1, 'month').format('YYYY-MM-DD'))
+
+	await getPlans(props.period)
+
+	isCopyingPlan.value = false
 }
 </script>
 
@@ -68,6 +83,10 @@ const updateData = (type?: 'plan' | 'transaction') => {
 						/>
 					</PopoverContent>
 				</Popover>
+
+				<Button v-if="!plansList.length" variant="secondary" @click="copyPlanFromPreviousPeriod"
+					>Copy plan from previous period</Button
+				>
 			</div>
 
 			<Tabs default-value="plan" class="w-full mt-6">

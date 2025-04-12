@@ -161,6 +161,7 @@ const handleDelete = () => {
 				<WidgetsTransaction
 					v-for="transaction in transactions"
 					:key="transaction.id"
+					:showTags="!plan.id"
 					:transaction
 					:tagsList
 					:accountList
